@@ -24,6 +24,20 @@ Change the out-dir in `settings.json` to:
 "latex-workshop.latex.outDir": "./build",
 ```
 
+The Clean-Method to `glob`,
+And the clean patterns to:
+
+```json
+"latex-workshop.latex.clean.patterns": [
+    ...,
+    "*.aux",
+    "*.synctex.gz",
+    "*/" // all empty folders
+],
+```
+
+So auxiliary in `build/` are cleaned automatically.
+
 After that, per default you build when saving the file (Ctrl+S).
 You can also manually build with `Ctrl+Alt+B`.
 Or change it to `onFileChange` to build on every change.

@@ -32,7 +32,6 @@ And the clean patterns to:
     ...,
     "*.aux",
     "*.synctex.gz",
-    "*/" // all empty folders
 ],
 ```
 

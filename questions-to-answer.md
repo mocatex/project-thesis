@@ -36,7 +36,66 @@
 * **Pipeline sketch:**
   Identify DL/AI lexicon -> yearly topic distributions -> co-mention network (company<->topic) -> “emergent themes over time” narrative.
 
----
+### 7) How has the public perception of Apple evolved between the launch of the first iPhone and the Apple Watch? (2007–2015)
+* **External tools:**:
+- Use of LLM's to decompose the question into sub-questions. 
+- Sentiment analysis models (ProsusAI/finBERT) are based on BERTA for sentiment analysis over time.
+- Topic Extraction: BERTopic for dominant discussion clusters.
+- Summarization: LLM's for generating concise summaries. GPT or similar models.
+- Finance API for stock prices or Google Trends API for public interest trends.
+* **Human Approach:** A human would probably:
+  1. Read articles from 2007-2015 about Apple, iPhone, Steve Jobs, Apple Watch and Tim Cook.
+  2. Note tone Shifts like Excitment around Key Launches like iPhone and Apple Watch but also criticism around issues like Antennagate and Labor Practices.
+* **Pipeline Sketch:** Question -> Decompose (Time + Aspect) -> Retrieve -> Analyze (Sentiment via FinBERT) -> Aggregate (Mean Score per period) -> Contrast (Tone Difference + Topic Shift) -> Summarize (LLM Synthesis) -> Evaluate (Hit-Rate + Trend Alignment)
+
+### 8) How did media sentiment towards Barack Obama change from his 2008 campaign to the end of his first term in 2012?
+* **External tools:** MiniLM Retriever, FinBERT for sentiment analysis, BERTopic for topic modeling and GPT-4 for summarization.
+* **Pipeline Sketch:**
+  1. Question
+  2. Decompose into time segments (2008 campaign, 2009-2012 first term)
+  3. Retrieve articles mentioning Barack Obama in each segment
+  4. FinBERT + BERTopic Analysis per Segment to get sentiment scores and dominant topics
+  5. Aggregate sentiment scores and topic distributions per segment
+  6. Contrast sentiment and topics between segments
+  7. Summarize findings using GPT-4
+
+### 9) How did the media coverage of the 2008-2009 financial crisis evolve into discussion of accountability by 2012 or later ?
+* **External Tools:** BM25 + MiniLM as for Retrieval, BERTopic for topic modeling, NLI Stance Model for accountability detection, GPT-4 for summarization.
+* **Pipeline Sketch:**
+  1. Question
+  2. Decompose into time segments (2008-2009 crisis, 2010-2012 accountability)
+  3. Retrieve articles mentioning financial crisis and accountability in each segment
+  4. BERTopic Analysis per Segment to get dominant topics
+  5. Stance Detection on accountability-related articles
+  6. Aggregate topic distributions and accountability stances per segment
+  7. Contrast topics and stances between segments
+  8. Summarize findings using GPT-4
+
+### 10) Climate Change Coverage Shift - How did media coverage evolve from early skepticism to global-acting framing (Paris 2015) ?
+* **External tools:** MiniLM Retriever, VADER + FinBERT for sentiment analysis, BERTopic for topic modeling, GPT-4 for summarization.
+* **Pipeline Sketch:** 
+  1. Question
+  2. Decompose into time segments (pre-2010 skepticism, post-2015 global action)
+  3. Retrieve articles mentioning climate change in each segment
+  4. VADER + FinBERT Analysis per Segment to get sentiment scores
+  5. BERTopic Analysis per Segment to get dominant topics
+  6. Aggregate sentiment scores and topic distributions per segment
+  7. Contrast sentiment and topics between segments
+  8. Summarize findings using GPT-4
+
+### 11) Electric Vehicle Acceptance / Adaptation - How did attitudes towards EVs shift from skepticism (First Roadster in 2008) to mainstream adoptation (Model S and beyond) ?
+* **External tools:** MiniLM Retriever, FinBERT for sentiment analysis, BERTopic for topic modeling, GPT-4 for summarization. Google Trends APi for public interest trends.
+* **Pipeline Sketch:** 
+  1. Question
+  2. Decompose into time segments (2008-2012 early skepticism, 2013-2020 mainstream adoption)
+  3. Retrieve articles mentioning electric vehicles in each segment
+  4. FinBERT + BERTopic Analysis per Segment to get sentiment scores and dominant topics
+  5. Aggregate sentiment scores and topic distributions per segment
+  6. Contrast sentiment and topics between segments
+  7. Summarize findings using GPT-4
+
+
+
 
 ## template to add more questions later
 

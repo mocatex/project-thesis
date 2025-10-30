@@ -1,0 +1,35 @@
+@startuml
+title Query → Temporal Multi-Hop Analytics (Sequence)
+
+actor User
+participant Planner
+participant "Hybrid Retriever\n(FAISS ∧ BM25)" as Ret
+database "Indexes\nFAISS / ES" as Idx
+collections "Docs\n(Parquet)" as Docs
+participant "FinBERT" as Sent
+participant "BERTopic" as Topics
+participant "Aggregator" as Agg
+participant "External Signals" as Ext
+participant "LLM Synthesizer" as LLM
+participant "Evaluator" as Eval
+
+User -> Planner : Q: "How did opinion on X change 2007–2015?"
+Planner --> User : Plan {periods, aspect_queries, topK}
+loop for each period
+  Planner -> Ret : retrieve(period, queries)
+  Ret -> Idx : ANN + BM25 (year-filtered)
+  Idx --> Ret : candidate ids
+  Ret -> Docs : fetch texts
+  Ret --> Planner : docs(period)
+  Planner -> Sent : score(docs(period))
+  Planner -> Topics : cluster(docs(period))
+end
+Planner -> Agg : combine {sentiment per period, topics, exemplars}
+Agg -> Ext : (optional) fetch series (stock, GDP, Trends)
+Ext --> Agg : aligned external signals
+Agg -> LLM : metrics + exemplars (+ signals)
+LLM --> User : concise, cited summary
+Planner -> Eval : log hit-rate, temporal fidelity, drift
+Eval --> User : quality metrics (dashboard)
+
+@enduml

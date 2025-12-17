@@ -1,0 +1,201 @@
+% Indicate the main file. Must go at the beginning of the file.
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------------------------
+% CHAPTER TEMPLATE
+%----------------------------------------------------------------------------------------
+
+
+\chapter{Methodology} % Main chapter title
+
+\label{ChapterMethodology} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
+
+%----------------------------------------------------------------------------------------
+% SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{Overview of the Proposed System}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/Pipeline-Overview.png}
+    \caption{Pipeline Overview}
+    \label{fig:pipeline-overview}
+\end{figure}
+
+This thesis proposes a modular, multi-stage processing pipeline as illustrated in Figure \ref{fig:pipeline-overview}. The Pipeline of the CorpusAgent system is designed to answer complex, temporally-aware analytic questions over a large corpus of documents, specifically news articles. With such large datasets, it is infeasible to load all data into a large language model (LLM) prompt due to context length limitations. Therefore, the system breaks down the processing into several stages, each handled by specialized modules. Each of these layers is responsible for a specific transformation or decision step.
+
+The core idea behind this architecture is to separate planning, retrieval, analysis, filtering and synthesis into independent stages. The separation of these stages allows for better scalability, maintainability, and the ability to swap out components as needed. Each layer incrementally refines the data, starting from a raw user query, progressing through structured retrieval and analytics processing and culminating in a final synthesized answer.
+
+As this concept of ours is still experimental, we tried to structure the system as modularly as possible, so that individual components of the pipeline can be replaced or improved independently with different be it retrieval strategies, LLM models, or analytic techniques. The following section will describe each of these layers in detail, explaining their roles, inputs, outputs, and interactions with other components in the system.
+
+
+%-----------------------------------
+% Pipeline Layers
+%-----------------------------------
+\section{Pipeline Architecture}
+
+The CorpusAgent pipeline is composed of a sequence of logically separated layers, each responsible for a specific aspect of the overall processing workflow. The layers are executed in a predefined order, where the output of one layer serves as the input for the next. This layered design allows complex analytical tasks to be decomposed into smaller, more manageable steps, improving transparency and enabling targeted evaluation of individual components.
+
+In the following subsections, each pipeline layer is described in detail. For each layer, its purpose, inputs, outputs, and interactions with other layers are explained.
+
+%-----------------------------------
+% Input Layer
+%-----------------------------------
+\subsection{Input Layer}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/input-layer.pdf}
+    \caption{Input Layer}
+    \label{fig:input-layer}
+\end{figure}
+
+The entry point of the CorpusAgent system is the Input Layer, as illustrated in Figure \ref{fig:input-layer}. It is responsible for receiving user queries, validating them, and performing any necessary preprocessing before passing them on to the subsequent layers.
+
+The interaction begins when a user submits a natural language question through the chatbot interface of our CorpusAgent system. These questions are typically high-level analytical queries that may span over mutliple years and require aggregation or interpretation over a large corpus of documents. 
+
+Upon receiving a query, the Input Layer forwards it to an either external or internal Large Language Model (LLM) for an initial reasoning step. At this stage, the LLM does not attempt to generate a final answer. Instead, it performs a lightweight decomposition and feasibility assessment of the query. Specifically, it evaluates whether the question falls within the temporal and thematic scope of the indexed data.
+
+The motivation behind this design decision is to introduce an explicit reasoning and validation step at the very beginning of the pipeline. By performing an initial feasibility assessment, the system can identify questions that cannot be meaningfully answered using the available corpus, for example due to missing temporal coverage or insufficient data. This early filtering prevents unnecessary downstream processing and ensures that subsequent pipeline stages operate only on well-scoped and answerable queries.
+
+The outcome of the assessment is a structured JSON format containing whether the question is answerable, the primary time period of interest and a short explanation justifying the decision. 
+
+
+
+%-----------------------------------
+% Multi-Stage Planning Layer
+%-----------------------------------
+
+\subsection{Multi-Stage Planning Layer}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/planning-layer.pdf}
+    \caption{Planning Layer}
+    \label{fig:planning-layer}
+\end{figure}
+
+The Multi-Stage Planning Layer is responsible for orchestrating the overall problem-solving strategy of the CorpusAgent systeem. Contrary to the other layers, this layer is rather integrated into each of the other layers instead of being a standalone module as illustrated in Figure \ref{fig:planning-layer}. Rather than following a fixed, hard-coded execution path, this module introduces an agentic control mechanism in which a Large Language Model (LLM) dynamically determines how a given query should be processed across the various pipeline layers.
+
+At this stage, the LLM is provided with a set of available external tools it can execute. These tools consist of function calls such as retrieval, natural language processing (NLP) analyses, document filtering and answer synthesis. However, the specific decisions regarding which tools to invoke, in what order and how many times are delegated to the LLM itself. Rather than a rigid sequence of operations, the planning layer enables a flexible, adaptive approach where the LLM can iteratively refine its strategy based on intermediate results. This design choice allows the system to adapt its strategy to the nature and complexity of the input query and can lead to multiple strategies for the same question.
+
+What makes this approach particularly powerful is that the decision-making authority is not limited to a single planning step. Instead, the LLM is invoked after each major pipeline stage to reassess the current state of the task and determine the next best approach.
+
+Each stage operates as a controlled execution step, while the overall reasing flow is handled by the LLM's conextual understanding ot the task. This agentic, multi-stage planning approach enables our system to handle a wide range of analytic queries with varying results. 
+
+The first concrete execution step is determined by the LLM is the retrieval of the relevant documents, which is described in the next section.
+
+
+\subsection{Retrieval Layer}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/retrieval-layer.pdf}
+    \caption{Retrieval Layer}
+    \label{fig:retrieval-layer}
+\end{figure}
+
+The Retrieval Layer is responsible for identifying and collecting a set of documents that are potentially relevant to the user’s query. Its primary goal is to efficiently reduce the overall corpus to a manageable subset that can be further analyzed by subsequent pipeline stages. An overview of this process is illustrated in Figure \ref{fig:retrieval-layer}.
+
+As like with the other layers, the retrieval process is guided by the retrieval planning decisions made by the Large Language Model. The LLM determines here the appropriate retrieval strategy based on the user query and provided toolset. Rather than directly accessing the data itself, the LLM generates a structured retrieval plan in the form of one or more function calls. These function calls specify which retrieval tools should be used, the corresponding query expressions, and additional parameters such as the number of documents to return. All retrieval related decisions, including whether multiple retrieval calls are required, for example to cover different time periods, are made by the LLM.
+
+Currently, the primary retrieval backend is OpenSearch, which is used to index the news corpus and enable fast full-text search. OpenSearch is based on the Lucene engine and relies on inverted indices, allowing keyword-based queries to be executed significantly faster than traditional relational database text matching. In preliminary experiments, this approach was empirically validated by comparing OpenSearch queries against SQL-based text search using \texttt{LIKE} expressions in PostgreSQL, where OpenSearch consistently produced substantially faster query execution times for large text collections. Which is to be expected given the underlying indexing mechanisms.
+
+The use of OpenSearch at this stage is not only motivated by performance considerations but also by extensibility. The retrieval interface is designed in such a manner, such that additional retrieval mechanisms such as semantic vector search or alternative indexing systems can be integrated in the future without requiring fundamental changes to the architecture.
+
+An example of a retrieval function call generated by the LLM is shown below:
+
+\begin{lstlisting}[language=json, caption={Example OpenSearch retrieval function call}, label={lst:opensearch-call}]
+{
+  "id": "call_VBCxxwHwvAluJHuoMOrdC6iF",
+  "type": "function",
+  "function": {
+    "name": "search_opensearch",
+    "arguments": {
+      "query": "Bitcoin (\"public perception\" OR \"public opinion\" OR sentiment OR adoption OR \"mainstream\" OR bubble OR scam OR regulation OR investment) 2016",
+      "top_k": 50
+    }
+  }
+}
+\end{lstlisting}
+
+Such function calls like the one shown in Listing \ref{lst:opensearch-call} are generated by the LLM based on the entire context provided to it, including the user query. These are then returned to the CorpusAgent in a structured JSON format. The CorpusAgent executes all the specified function calls and collects the resulting documents.
+
+The system eomploys both a PostgreSQL database and an OpenSearch index to balance data integrity, flexibility and retrieval performance. Here we use PostgreSQL as the primary data store and authoritative source of truth for all news articles and associated metadata. The reason behind this design choice is to ensure that the complete and consistent dataset is maintained in a robust relational database system. 
+
+Using a relational database as the main data source also provides more flexibility for future extensions of the news corpus or completely new datasets. Different datasets may have additional metadata beyond the basic fields such as headlines and article text. Such attributes may be relevant for downstream analysis or filtering steps but not necessarily suitable or required for indexing in OpenSearch. Maintaining these attributes in PostgreSQL allows the system to evolve without requiring changes to the indexing structure.
+
+Therefore OpenSearch is used as a secondary, specialized component optimized for large scale text retrieval. Separating these concerns allows the system to combine the strengths of both technologies, having a reliable primary data store while leveraging the performance benefits of a dedicated search engine for text retrieval tasks.
+
+In addition to these persisent data stores, the system maintains a temporary, per-run working database that archives all retrieved documents and intermediate NLP outputs generated during a single pipeline execution. The purpose of this temporary dataset is primarily intended for debugging, analysis and result validation. Given the exploratory and analytical nature of the task, determining whether a generated answer is correct is inherently challenging. Instead of relying solely on the final answers, this design allows the the user to inspect the entire processing history, including which documents were retrieved and how they were analyzed. This transparency facilitates error analysis and helps identify potential issues in the retrieval or processing steps. Not to mention, it allows the user to assess whether the final answer is grounded in the retrieved evidence rahter than relying on unsupported or hallucinated information.
+
+% TODO : Add a SQL Database Schema Figure
+\subsection{Analytics Layer}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/analytics-layer.pdf}
+    \caption{Analytics Layer}
+    \label{fig:analytics-layer}
+\end{figure}
+
+The Analytics Layer is responsible for applying targeted natural language processing (NLP) methods to the working set of documents retrieved in the previous stage. Primarily, its objective is to extract structured signals from unstructured text that support higher-level analytical reasoning, such as identifying trends, sentiments, entities, or events over time. An overview of this process is illustrated in Figure~\ref{fig:analytics-layer}.
+
+At the beginning of this layer, the Large Language Model (LLM), guided by the Multi-Stage Planning Layer, determines which analytical tools are appropriate for the given query. Rather than executing all available NLP methods indiscriminately, the system adopts a selective approach in which the LLM first classifies the nature of the question, for example as exploratory, comparative, predictive, or causal. Based on this classification, the LLM selects a subset of NLP tools and configures their parameters accordingly. Additionally, we prompt the LLM to provide a brief explanation of why specific tools were chosen, which serves as documentation for the analytical strategy. Furthermore we ask the LLM to suggest any additional tools that could be relevant for future iterations, even if they are not executed in the current run.
+
+
+The applied NLP methods represent well-established techniques for extracting structured information from large text corpora, including sentiment analysis, topic modeling, named entity recognition, and event detection. Such techniques have been extensively studied and applied in prior work on text analytics and information extraction \cite{jurafsky2023slp, blei2003lda, pang2008sentiment}.
+
+Currently in this concept phase, we have only mocked the actual implementation of these NLP tools. However, in a fully realized system, each selected tool would be executed over the temporary working dataset produced by the Retrieval Layer. The outputs of these analyses would then be stored back into the working database, enriching the document set with structured annotations that can be leveraged in subsequent processing steps.
+
+Depending on the type of analysis, the NLP Outputs are either stored per article (e.g., sentiment scores, named entities) or when there are cross-document results (e.g., topics, event clusters), they are stored in separate tables linked to the relevant articles. This structured storage approach allows for efficient querying and aggregation of analytical results during later stages of the pipeline.
+
+
+All selected NLP tools are executed over the temporary working dataset produced by the Retrieval Layer. By operating on this reduced document set, the system avoids unnecessary computation over the full corpus while still retaining sufficient contextual coverage for meaningful analysis. The LLM specifies tool selections, execution order, and configuration parameters in a structured JSON format, which is subsequently interpreted and executed by the CorpusAgent.
+
+Once all selected NLP analyses have been completed, the enriched working dataset is passed to the Document Selection and Filtering Layer for further refinement.
+
+\pagebreak
+
+\subsection{Document Selection / Filtering Layer}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/document-filtering.pdf}
+    \caption{Document Selection / Filtering Layer}
+    \label{fig:document-filtering-layer}
+\end{figure}
+
+The Document Selection and Filtering Layer is responsible for refining the analytically enriched working dataset to a focused subset of documents that most effectively support the final answer synthesis. Previous pipeline stages were primarily concerned with broad retrieval and comprehensive analysis. In contrast, this layer aims to distill the dataset down to the most relevant and informative documents. An overview of this process is illustrated in Figure \ref{fig:document-filtering-layer}.
+
+Here the filtering process first off begins with a lightweight, deterministic pre-filtering step directly inside the CorpusAgent. This step applies simple algorithmic criteria to eliminate documents that are clearly irrelevant or low-quality. Such criteria may include removing duplicates, filtering out articles below a certain length, or excluding documents that do not meet the time horizon of the task. This initial pruning helps reduce noise and focuses subsequent processing on a more manageable set of candidates.
+
+After this initial pre-filtering, the refined working dataset is represented in a structured format that combines retrieved metadata and analytical annotations from the analytical layer. This structured representation includes among other attributes, the publication year, title, full article text, retrieval score (e.g. BM25), sentiment score and label and identified named entities. These attributes can vary depending on the specific NLP tools applied in the previous layer.
+
+In this next step, the CorpusAgent forwards these document representations in batches to the Large Language Model (LLM). Instead of selecting documents based on fixed attributes like retrieval scores or sentiment thresholds, we prompt the LLM to reason with the initial user query in mind, to determine which documents are most important to answering the question.
+
+As a result, the LLM evalutes in each batch which documents are most relevant and informative for the specific analytical task. The selected document IDs are then returned to the CorpusAgent in a structured JSON format with once again an explanation of why these documents were chosen. Inside the temporary working database, the CorpusAgent marks these documents as selected for inclusion in the final answer synthesis.
+
+Finally, once all documents have been processed, the CorpusAgent once again prompts the LLM to generate a summary of each year represented in the selected documents. These yearly summaries provide a concise overview of the key themes, events, and trends identified in the filtered dataset. They also serve to reduce the overall context length required for the final answer synthesis step, as only the summaries rather than the full articles need to be considered.
+
+Our motivation behind this layer was to introduce a human-like judgment step into the pipeline. Rather than relying solely on algorithmic criteria, we leverage the LLM's contextual understanding to make nuanced decisions about document relevance. This approach allows the system to adaptively focus on the most pertinent information for each unique query, ultimately improving the quality and accuracy of the final synthesized answers.
+
+With the selected documents and yearly summaries prepared, the pipeline is now ready to proceed to the final stage: LLM Answer Synthesis.
+
+\subsection{LLM Answer Synthesis}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/final-synthesize.pdf}
+    \caption{LLM Answer Synthesis Layer}
+    \label{fig:llm-answer-synthesis-layer}
+\end{figure}
+
+The final stage of the CorpusAgent pipeline is the LLM Answer Synthesis Layer, as illustrated in Figure \ref{fig:llm-answer-synthesis-layer}. This layer is responsible for generating a coherent, well-structured answer to the user's original query based on the refined set of documents and analytical insights produced by the preceding layers. Combined with the input layer, these two layers are the only parts of the pipeline that directly interact with the user. At this point, the system relies solely on the condensed, temporally organized summaries that capture the most relevant information extracted from the corpus.
+
+The CorpusAgent passes the yearly summaries derived from the Documen Selection phase before to the LLM along with the original user query. Additionally, we provide even further context if available, such as NLP outputs that may span over multiple documents (e.g., identified trends or events). The LLM is then prompted to synthesize this information into a comprehensive answer that directly addresses the user's question.
+
+The synthesis process focuses on identifying overarching patterns, temporal developments, and meaningful comparisons across time periods. For example, shifts in sentiment, changes in dominant topics, or the emergence of new narratives can be explicitly highlighted and related back to the original analytical question. The resulting output is a single, consolidated answer that integrates insights across all relevant years.
+
+Finally, the synthesized answer is returned to the user through the chatbot interface of the CorpusAgent system. By separating answer generation from retrieval, analysis, and document selection, this layer provides a clear abstraction boundary and ensures that the final response can be traced back to specific intermediate representations. This transparency is crucial for validating the correctness and reliability of the generated answers, especially in complex analytical scenarios.

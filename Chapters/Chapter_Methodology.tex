@@ -27,28 +27,28 @@ For the purpose of this thesis, a reduced cross-section of this dataset was used
 Each entry in the dataset inlcudes heading, publication year, source URL and a raw text field containing the article body.
 
 \begin{table}[!htbp]
-\centering
-\caption{Example news article entry from the CC-News dataset (content truncated for readability).}
-\label{tab:dataset-example}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{|l|p{10cm}|}
-\hline
-\textbf{Field} & \textbf{Value} \\
-\hline
-Title & Samsung Names Scion Lee Jae-Yong to Board Of Directors \\
-\hline
-Year & 2016 \\
-\hline
-Source Domain & hamodia.com \\
-\hline
-Article ID & 397547 \\
-\hline
-Body (snippet) &
-Monday, September 12, 2016 at 2:09 pm.  
-Lee Jae-yong (AP Photo/Ahn Young-joon, File).  
-Samsung Electronics vice chairman Lee Jae-yong was nominated to join its board of directors. The announcement comes as the company grapples with a major smartphone recall affecting millions of devices\ldots \\
-\hline
-\end{tabular}
+    \centering
+    \caption{Example news article entry from the CC-News dataset (content truncated for readability).}
+    \label{tab:dataset-example}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{10cm}|}
+        \hline
+        \textbf{Field} & \textbf{Value}                                                                                                                                                                                \\
+        \hline
+        Title          & Samsung Names Scion Lee Jae-Yong to Board Of Directors                                                                                                                                        \\
+        \hline
+        Year           & 2016                                                                                                                                                                                          \\
+        \hline
+        Source Domain  & hamodia.com                                                                                                                                                                                   \\
+        \hline
+        Article ID     & 397547                                                                                                                                                                                        \\
+        \hline
+        Body (snippet) &
+        Monday, September 12, 2016 at 2:09 pm.
+        Lee Jae-yong (AP Photo/Ahn Young-joon, File).
+        Samsung Electronics vice chairman Lee Jae-yong was nominated to join its board of directors. The announcement comes as the company grapples with a major smartphone recall affecting millions of devices\ldots \\
+        \hline
+    \end{tabular}
 \end{table}
 
 Table \ref{tab:dataset-example} shows an example entry from the CC-News dataset, illustrating the structure and content of a typical news article record. The body field has been truncated for readability.
@@ -67,7 +67,7 @@ The suitability of news corpora for diachronic analysis has also been demonstrat
 
 \subsection{Dataset Variants / Preprocessing}
 
-The CC-News dataset has already undergone several preprocessing and quality assurance steps prior to its release. Non-English documents are removed and low quality content such as advertisements is filtered using heuristic methods. Additionally, the dataset is globally deduplicated and cross-deduplicated against external corpora such as OpenWebText2, resulting in the removal of approximately 0.3 million documents \cite{openwebtext2}. 
+The CC-News dataset has already undergone several preprocessing and quality assurance steps prior to its release. Non-English documents are removed and low quality content such as advertisements is filtered using heuristic methods. Additionally, the dataset is globally deduplicated and cross-deduplicated against external corpora such as OpenWebText2, resulting in the removal of approximately 0.3 million documents \cite{openwebtext2}.
 
 Beyond the dataset's native preprocessing, no additional manual cleaning or annotation was applied in this thesis. Articles were filtered primarily by language, minimum text length, and year-based slicing to support temporal analysis. This design choice reflects our goal emphasis on scalable, automated exploration rather than curated or manually labeled datasets.
 
@@ -78,10 +78,10 @@ To efficiently manage and query the large dataset, the corpus is stored using a 
 For efficient text retrieval, an OpenSearch index is constructed over selected textual fields. OpenSearch provides optimized inverted indexing based on the Lucene engine, enabling fast keyword-based retrieval over millions of documents. Inverted index–based retrieval systems commonly rely on probabilistic ranking functions such as BM25 \cite{manning2008ir,robertson2009bm25}, which score documents based on term frequency, inverse document frequency, and document length normalization:
 
 \begin{equation}
-\text{BM25}(q, d) = \sum_{t \in q}
-IDF(t) \cdot
-\frac{f(t,d)\,(k_1 + 1)}
-{f(t,d) + k_1 \left(1 - b + b \cdot \frac{|d|}{\text{avgdl}}\right)}
+    \text{BM25}(q, d) = \sum_{t \in q}
+    IDF(t) \cdot
+    \frac{f(t,d)\,(k_1 + 1)}
+    {f(t,d) + k_1 \left(1 - b + b \cdot \frac{|d|}{\text{avgdl}}\right)}
 \end{equation}
 
 The BM25 ranking function scores documents based on how frequently and distinctively query terms occur in each document, while normalizing for document length to ensure fair comparison across heterogeneous text sources.
@@ -300,12 +300,109 @@ This design mirrors the high-level workflow shown in the Figure \ref{fig:visuali
 
 \subsection{Data Sources and Run Selection}
 
-The playground is run-centric: the user selects a run_id corresponding to a previously executed pipeline run. \\
-The implementation provides a small run management module that lists recent runs and fetches detailed run information from the pipeline_runs table, including fields such as question, final_answer, and additional stored debug artifacts. These run-level fields serve two purposes:
+The playground is run-centric: the user selects a run\_id corresponding to a previously executed pipeline run. \\
+The implementation provides a small run management module that lists recent runs and fetches detailed run information from the pipeline\_runs table, including fields such as question, final\_answer, and additional stored debug artifacts. These run-level fields serve two purposes:
 
 \begin{enumerate}
     \item Semantic context for the visualization planner and code generator (the LLM is conditioned on what the run was trying to answer).
     \item Traceability since produced charts can always be linked back to an immutable run identifier.
 \end{enumerate}
 
-In addition to run metadata, the playground queries the per-run working dataset stored in pipeline_run_articles (linked to the main corpus table article_corpus). The design intentionally queries only a reduced, run-specific slice rather than the entire corpus to keep visualization computation bounded and directly relevant to the specific analytical question.
+In addition to run metadata, the playground queries the per-run working dataset stored in pipeline\_run\_articles (linked to the main corpus table article\_corpus). The design intentionally queries only a reduced, run-specific slice rather than the entire corpus to keep visualization computation bounded and directly relevant to the specific question.
+
+\begin{lstlisting}[caption={Example DB schema summary}, label={lst:db-schema}]
+article_corpus(id bigint, year smallint, source_domain text, title text, body text)
+
+pipeline_run_articles(run_id uuid, question text, article_id bigint, rank integer, os_score real, sentiment_score real, relevance_score real, extra_metadata jsonb)
+
+pipeline_runs(run_id uuid, question text, nlp_plan jsonb, mocked_tool_outputs jsonb, final_answer text, created_at timestamp with time zone)
+\end{lstlisting}
+
+\subsection{LLM-Based Visualization Planning}
+
+The first step is planning: given (question, final\_answer, run\_id), the planner asks the LLM to propose a set of charts expressed as a JSON structure. \\
+Each chart entry contains: a stable identifier \textit{id}, a human-readable \textit{title}, an SQL query string \textit{sql}, a minimal plot specification \textit{plot} (e.g. type, x, y) and an output \textit{filename} (PNG).
+
+This plan is explicitly constrained to valid JSON via structured response formatting (JSON object), which makes downstream handling deterministic (e.g., rendering the plan in the UI, validating presence of required fields). The planner prompt also injects a compact schema summary so the model does not need to guess table/column names.
+
+The full JSON plan can be inspected before proceeding to code generation, allowing the user to verify that the proposed charts align with their expectations.
+
+\begin{lstlisting}[caption={Example Visualization Plan JSON}, label={lst:viz-plan}]
+{
+    "charts": [
+        index : {
+            "id": "...",
+            "title": "...",
+            "sql": "... WHERE pra.run_id = :run_id ...",
+            "plot": { "type": "line|bar", "x": "...", "y": "..." },
+            "filename": "...png"
+        },
+        ...
+    ]
+}
+\end{lstlisting}
+
+A key design concern is the presence of \textit{extra\_metadata} stored as JSONB, which varies between runs. To reduce hallucinated JSON keys, the planner additionally includes a glimpse of observed JSON key paths and examples extracted from the selected run. The LLM is instructed to use only those keys and to query JSONB via Postgres JSON operators when needed.
+
+\subsection{LLM-Based Code Generation}
+
+The visualization plan is intentionally lightweight. It is primarily meant for transparency and for guiding the next step: code generation. \\
+In the second step, the system prompts the LLM to generate Python plotting code that queries the PostgreSQL database and produces PNG charts using Matplotlib. The code generator is constrained through explicit rules, including:
+
+\begin{itemize}
+    \item return only Python code (no markdown)
+    \item use Matplotlib (avoid additional plotting dependencies)
+    \item obtain data via a provided \textit{query\_df(sql, params)} helper
+    \item save output figures only through a provided \textit{save\_fig(fig, filename)} function
+\end{itemize}
+
+This separation (plan → code) is deliberate: the plan acts as a structured, inspectable intermediate representation, while the code step is responsible for the full procedural details (data preparation, grouping/aggregation, plotting, labeling, and exporting).
+It also helps preventing hallucinated Code regarding paths, run\_id usage, and saving conventions.
+
+\subsection{Controlled Execution and Artifact Management}
+
+To execute LLM-generated code while keeping the system reproducible and debuggable, the playground runs the generated script via a wrapper-based execution mechanism:
+\begin{enumerate}
+    \item The user-generated code is written to an artifact directory under the selected run\_id.
+    \item A wrapper script is created which injects:
+          \begin{itemize}
+              \item environment-backed values (RUN\_ID, OUT\_DIR)
+              \item the database query helper query\_df
+              \item and a constrained \textit{save\_fig} routine that validates .png filenames and writes output into OUT\_DIR
+          \end{itemize}
+    \item The wrapper is executed in a subprocess with an explicit timeout to prevent runaway code.
+    \item Standard output/error are captured into log files.
+    \item All produced PNGs are collected from the artifact directory and displayed in the interface.
+\end{enumerate}
+
+Artifacts are stored in a structured directory layout (e.g., artifacts/visuals/<run\_id>/...) to ensure that every generated visualization is reproducible and attributable to a run. \\
+Since this feature is heavily volatile, due to LLM code generation, persisting the generated code and execution logs is also crucial for failure analysis: when plots fail to render (e.g., SQL errors, schema mismatches, missing fields), the developer can directly inspect the exact script, stdout, and stderr of the run.
+
+\begin{lstlisting}[language=Python, caption={Safety and reproducibility wrapper for executing LLM-generated plotting code}, label={lst:code-exec-wrapper}]
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import matplotlib.pyplot as plt
+
+from viz.db import query_df  # SQLAlchemy-based query_df
+
+# path setup
+RUN_ID = os.environ.get("RUN_ID")
+OUT_DIR = Path(os.environ.get("OUT_DIR", ".")).resolve()
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# constrained save_fig implementation
+def save_fig(fig, filename: str) -> str:
+    if not filename.endswith(".png"):
+        raise ValueError("filename must end with .png")
+    path = (OUT_DIR / filename).resolve()
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+# --- user code below ---
+run_id = RUN_ID
+{user_code}
+\end{lstlisting}
+

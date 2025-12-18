@@ -225,3 +225,40 @@ The CorpusAgent passes the yearly summaries derived from the Documen Selection p
 The synthesis process focuses on identifying overarching patterns, temporal developments, and meaningful comparisons across time periods. For example, shifts in sentiment, changes in dominant topics, or the emergence of new narratives can be explicitly highlighted and related back to the original analytical question. The resulting output is a single, consolidated answer that integrates insights across all relevant years.
 
 Finally, the synthesized answer is returned to the user through the chatbot interface of the CorpusAgent system. By separating answer generation from retrieval, analysis, and document selection, this layer provides a clear abstraction boundary and ensures that the final response can be traced back to specific intermediate representations. This transparency is crucial for validating the correctness and reliability of the generated answers, especially in complex analytical scenarios.
+
+\pagebreak
+
+\section{Visualization Playground (Auxiliary Component)}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/visualization-playground.pdf}
+    \caption{Visualization Playground (own illustration)}
+    \label{fig:visualization-playground}
+\end{figure}
+
+The CorpusAgent pipeline is designed to answer complex analytical questions over large news corpora by decomposing the task into retrieval, analysis, filtering, and synthesis stages. \\
+However, corpus-level analytics are difficult to validate purely from a final textual answer. Users typically need to inspect temporal trends, distributions, and supporting evidence to judge whether the answer is grounded in the retrieved material. Also, visualizations can help communicate complex patterns more effectively than text alone.
+To support this requirement, we implemented a Visualization Playground as an auxiliary component that generates plots and diagrams on demand for a selected pipeline run.
+Conceptually, the playground consumes two persistent information sources:
+
+\begin{itemize}
+    \item The authoritative corpus and per-run working set stored in PostgreSQL
+    \item The pipeline run metadata and outputs (e.g., question, final answer, and structured intermediate artifacts) stored in a separate run database
+\end{itemize}
+
+Based on this input, the system produces a visualization plan (structured JSON), generates executable plotting code, and renders the resulting images as reproducible artifacts that can be inspected inside the interface.
+
+This design mirrors the high-level workflow shown in the Figure \ref{fig:visualization-playground}: an LLM produces a JSON visualization specification and plotting code which is executed to create charts saved as run artifacts.
+
+\subsection{Data Sources and Run Selection}
+
+The playground is run-centric: the user selects a run_id corresponding to a previously executed pipeline run. \\
+The implementation provides a small run management module that lists recent runs and fetches detailed run information from the pipeline_runs table, including fields such as question, final_answer, and additional stored debug artifacts. These run-level fields serve two purposes:
+
+\begin{enumerate}
+    \item Semantic context for the visualization planner and code generator (the LLM is conditioned on what the run was trying to answer).
+    \item Traceability since produced charts can always be linked back to an immutable run identifier.
+\end{enumerate}
+
+In addition to run metadata, the playground queries the per-run working dataset stored in pipeline_run_articles (linked to the main corpus table article_corpus). The design intentionally queries only a reduced, run-specific slice rather than the entire corpus to keep visualization computation bounded and directly relevant to the specific analytical question.

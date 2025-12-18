@@ -86,6 +86,75 @@ For efficient text retrieval, an OpenSearch index is constructed over selected t
 
 The BM25 ranking function scores documents based on how frequently and distinctively query terms occur in each document, while normalizing for document length to ensure fair comparison across heterogeneous text sources.
 
+%----------------------------------------------------------------------------------------
+% EVALUATION QUESTION SET AND EXPERIMENTAL DESIGN
+%----------------------------------------------------------------------------------------
+
+\section{Evaluation Question Set and Experimental Design}
+
+\subsection{Rationale and Design Goals}
+
+To evaluate the proposed CorpusAgent pipeline beyond anecdotal demonstrations, we define a structured set of evaluation questions that act as a task-oriented benchmark for the system. The goal of this question set is not to test factual question answering in isolation, but rather to assess whether a multi-stage pipeline can (i) retrieve relevant evidence from a large corpus, (ii) extract structured signals using classical NLP components, (iii) aggregate these signals across time, and (iv) synthesize an interpretable, verifiable narrative answer grounded in the retrieved material.
+
+The questions were selected to cover diverse topical domains (politics, technology, finance, public health, climate discourse), different temporal dynamics (slow narrative shifts versus event-driven changes), and varying degrees of required tool composition. In addition, the set includes explicit negative and counterfactual controls to test robustness against spurious correlations and unsupported premises. This design reflects the dual objectives of demonstrating the analytical capabilities of the pipeline while also probing its reliability and interpretability properties.
+
+\subsection{Question Categories}
+
+The evaluation questions are grouped into four categories, each targeting a specific capability of the system:
+
+\textbf{(A) Core longitudinal questions.}
+These questions represent the primary target use case of the system: temporally-aware analysis of media narratives and tone over multi-year periods (2016--2021). They require evidence aggregation across time and typically involve one or more external signals for contextualization.
+
+The question in this category:
+\begin{itemize}
+    \item A1 - Trump: media sentiment vs US market volatility \\ \textit{How did media sentiment towards Donald Trump evolve from the 2016 campaign through the end of his presidency (2016–2020), and how did it align with volatility spikes in VIX / S\&P 500 drawdowns around major events (election night, travel ban, trade-war escalations, impeachment, COVID crash)?}
+    \item A2 - Facebook / Cambridge Analytica: shift to "techlash" + stock drawdowns \\ \textit{How did Facebook coverage shift from innovation/growth framing to privacy/regulation framing around the Cambridge Analytica scandal (2016–2019), and how did this correspond to FB stock drawdowns?}
+    \item A3 - COVID-19: tone + topic evolution across phases \\ \textit{How did media tone and dominant themes around COVID-19 evolve from outbreak (late 2019/early 2020) to vaccine rollout (2021), and how did health vs economy vs civil-liberty frames compete over time?}
+    \item A4 - Greta Thunberg / youth climate activism: framing across regions \\ \textit{How did media coverage of Greta Thunberg and youth climate activism evolve (2018–2021), and how did framing differ by region/outlet type (personalization vs policy vs skepticism/backlash)?}
+    \item A5 - Crypto cycles: tone/themes vs BTC market phases \\ \textit{How did media tone and themes around Bitcoin/crypto change across the 2017 bull run, 2018 crash, and 2020–2021 bull market, and how did topic shifts align with BTC turning points?}
+    \item A6 - Tesla/EV mainstreaming: hype vs safety vs market acceptance \\ \textit{How did media sentiment towards Tesla/EVs evolve (2016–2021), especially around Autopilot accidents, Model 3 production issues, and S\&P 500 inclusion, and how did this align with TSLA price moves?}
+    \item A7 - US–China trade war \& Huawei/5G: competing frames \\ \textit{How did Western media coverage of Huawei and the US–China trade war evolve (2018–2021), and how did security vs economic vs tech-innovation frames compete across regions?}
+    \item A8 - Brexit negotiations: coverage tone vs GBP volatility \\ \textit{How did media tone and key themes around Brexit evolve from the 2016 referendum through the UK's exit process (2016–2020), and how did sentiment/topic shifts align with GBP volatility around major milestones (Article 50, deal votes, extensions, withdrawal agreement)?}
+\end{itemize}
+
+\textbf{(B) Multi-hop / tool-composition questions.}
+These questions are designed to test whether the agent can resolve an indirection step prior to corpus retrieval. Concretely, the system must first determine a canonical entity from an oblique description (e.g., "the company that owns Instagram"), identify an appropriate temporal anchor (e.g., a key event date or window), and only then execute the corpus pipeline. This category primarily evaluates planning and tool orchestration rather than raw retrieval.
+
+The questions in this category:
+\begin{itemize}
+    \item B1 - Spouse indirection (Bill Gates → Melinda French Gates) + 2021 divorce \\ \textit{How did media coverage of the spouse of the Microsoft co-founder who runs a major philanthropic foundation change around the 2021 divorce announcement?}
+    \item B2 - Parent company (Instagram → Facebook/Meta) around Cambridge Analytica \\ \textit{How did media sentiment towards the company that owns Instagram change before vs after the Cambridge Analytica scandal?}
+    \item B3 - Role + other company (SpaceX founder → Tesla) + SEC settlement (2018) \\ \textit{How did media coverage of the electric-car company led by the founder of SpaceX change after the 2018 SEC settlement over tweets?}
+    \item B4 - Movement figurehead ("How dare you" UN 2019 → Greta Thunberg) \\ \textit{How did global media coverage of the youth climate activist behind the "How dare you" UN speech change between 2018 and 2021?}
+    \item B5 - Owner/brand mapping (WhatsApp → Meta) + encryption/data-sharing debate \\ \textit{How did media tone towards the company that owns WhatsApp change around the 2016–2017 encryption and data-sharing debates?}
+    \item B6 - Product → parent company (TikTok → ByteDance) + US ban pressure \\ \textit{How did media tone towards the company that owns TikTok evolve around the 2020–2021 US ban / divestment pressure, and did the dominant framing shift between "national security" vs "tech/consumer product" vs "geopolitics"?}
+\end{itemize}
+
+\textbf{(C) Negative-control questions.}
+Negative controls are intentionally constructed such that no meaningful relationship should be detectable. For these questions, correct behavior is not the construction of an elaborate narrative, but an explicit conclusion that no robust relationship is supported by the retrieved data, accompanied by brief diagnostic justification (e.g., weak and unstable correlations, low coverage volume, or inconsistent effects across time).
+
+The questions in this category:
+\begin{itemize}
+    \item C1 - Bitcoin vs consumer staples sentiment (Colgate-Palmolive) \\ \textit{Did Bitcoin price movements (2016–2021) have any systematic impact on media sentiment towards Colgate-Palmolive?}
+    \item C2 - Oscars vs US bank sentiment \\ \textit{Did the number of Oscars won in a year meaningfully affect media sentiment toward major US banks (JPM, BAC, etc.) from 2016–2021?}
+    \item C3 - Zurich weather vs OPEC sentiment \\ \textit{Is there any meaningful relationship between daily weather in Zurich and media sentiment towards OPEC decisions (2016–2021)?}
+    \item C4 - eSports results vs central bank policy coverage \\ \textit{Did major eSports tournament results (e.g., LoL Worlds winners) cause measurable shifts in sentiment about Fed/ECB policy (2016–2021)?}
+\end{itemize}
+
+\textbf{(D) Counterfactual / impossible-event controls.}
+Finally, a small set of plausible-sounding questions is included where the premise is false (i.e., the referenced event did not occur). This category tests whether the system can detect unsupported assumptions and respond conservatively. In such cases, a correct answer must explicitly flag the premise as incorrect or not supported by evidence, rather than attempting to "fill in" a narrative by hallucination.
+
+The questions in this category:
+\begin{itemize}
+    \item D1 - "Meta rebrand in 2018" (counterfactual) \\ \textit{How did media sentiment toward Facebook change after the company rebranded to "Meta" in 2018, and did coverage shift toward "metaverse" framing immediately afterward (2018–2019)?}
+    \item D2 - "Amazon spun off AWS in 2019 IPO" (counterfactual) \\ \textit{How did media coverage of Amazon change after it spun off AWS via a separate IPO in 2019, particularly regarding antitrust and valuation framing (2018–2020)?}
+\end{itemize}
+
+With these four categories, we aim to comprehensively evaluate the capabilities of the proposed CorpusAgent pipeline across a range of realistic and challenging scenarios.
+
+%----------------------------------------------------------------------------------------
+% OVERVIEW OF THE PROPOSED SYSTEM
+%----------------------------------------------------------------------------------------
 
 \section{Overview of the Proposed System}
 
@@ -275,6 +344,10 @@ Finally, the synthesized answer is returned to the user through the chatbot inte
 
 \pagebreak
 
+%-----------------------------------
+% Visualization Playground
+%-----------------------------------
+
 \section{Visualization Playground (Auxiliary Component)}
 
 \begin{figure}[ht]
@@ -379,8 +452,6 @@ Artifacts are stored in a structured directory layout (e.g., artifacts/visuals/<
 Since this feature is heavily volatile, due to LLM code generation, persisting the generated code and execution logs is also crucial for failure analysis: when plots fail to render (e.g., SQL errors, schema mismatches, missing fields), the developer can directly inspect the exact script, stdout, and stderr of the run.
 
 \begin{lstlisting}[language=Python, caption={Safety and reproducibility wrapper for executing LLM-generated plotting code}, label={lst:code-exec-wrapper}]
-from __future__ import annotations
-
 import os
 from pathlib import Path
 import matplotlib.pyplot as plt

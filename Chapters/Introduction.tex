@@ -1,0 +1,22 @@
+% !TEX root = ../main.tex
+%----------------------------------------------------------------------------------------
+
+% INTRODUCTION CHAPTER
+
+\chapter{Introduction} % Main chapter title
+
+\label{Chapter1}
+
+Large news corpora contain detailed records of real-world events and their public perception over time. They document how topics emerge, how narratives evolve, and how different actors are portrayed across sources and time periods.
+
+Such data offers significant potential for research in areas such as media analysis, economics, and political science.
+At the same time, extracting meaningful insights from large news corpora is difficult. Relevant information is distributed across many documents, sources, and time spans, making manual analysis impractical or even impossible. \\
+Many research questions are inherently complex and temporal, for example how media sentiment changes during a corporate crisis or how thematic focus shifts throughout major events. Simple keyword searches or document-level summaries are not powerful enough to answer such questions.
+Classical natural language processing techniques enable scalable extraction of structured signals such as entities, keywords, sentiment, and topics. However, these methods typically produce results that require substantial manual interpretation since they lack deep reasoning capabilities.
+
+Recent Large Language Models, on the other hand, can generate coherent natural-language explanations but cannot reliably operate directly on large corpora because of input size limitations (e.g. context windows) and high computational costs.
+This tension reveals a gap between scalable corpus-level analysis and high-level, interpretable reasoning.
+This thesis addresses this gap by presenting a hybrid analysis system for large news corpora. The proposed approach combines classical NLP methods for scalable, structured analysis with LLM-based reasoning for synthesis and explanation. A database-centric architecture is used to store documents and intermediate results, enabling reproducible analyses and traceable answers to complex research questions.
+The objective of this project is to demonstrate how such a system can support large-level analysis of big data collections. The approach is evaluated using case studies on a large English-language news corpus, showing how temporal developments, sentiment shifts, and thematic changes can be analyzed and explained in an integrated manner.
+
+This thesis focuses on system design and applied analysis rather than the development of new NLP models. Its contribution lies in the integration of existing methods into a coherent architecture and in demonstrating how LLMs can be used responsibly and effectively as part of a larger analytical workflow.

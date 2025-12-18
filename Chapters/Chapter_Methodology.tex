@@ -24,6 +24,37 @@ The entirity of the dataset contains approximately 134 million rows of news arti
 
 For the purpose of this thesis, a reduced cross-section of this dataset was used. Approximately 10\% of the original corpus was sampled, resulting in our working dataset of roughly 13 million articles. The reduction was necessary to ensure feasible processing times and resource requirements. Given the exploratory nature of this thesis, the reduced dataset still provides sufficient coverage and diversity to evaluate the proposed system and conduct meaningful analyses.
 
+Each entry in the dataset inlcudes heading, publication year, source URL and a raw text field containing the article body.
+
+\begin{table}[!htbp]
+\centering
+\caption{Example news article entry from the CC-News dataset (content truncated for readability).}
+\label{tab:dataset-example}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Field} & \textbf{Value} \\
+\hline
+Title & Samsung Names Scion Lee Jae-Yong to Board Of Directors \\
+\hline
+Year & 2016 \\
+\hline
+Source Domain & hamodia.com \\
+\hline
+Article ID & 397547 \\
+\hline
+Body (snippet) &
+Monday, September 12, 2016 at 2:09 pm.  
+Lee Jae-yong (AP Photo/Ahn Young-joon, File).  
+Samsung Electronics vice chairman Lee Jae-yong was nominated to join its board of directors. The announcement comes as the company grapples with a major smartphone recall affecting millions of devices\ldots \\
+\hline
+\end{tabular}
+\end{table}
+
+Table \ref{tab:dataset-example} shows an example entry from the CC-News dataset, illustrating the structure and content of a typical news article record. The body field has been truncated for readability.
+
+\pagebreak
+
 \subsection{Dataset Motivation}
 
 Our main objective with this thesis was to explore how LLMs can be effectively combined with classical NLP methods to answer complex, temporally-aware analytical questions over large text corpora. A news corpus was selected as the underlying data source both due to its relevance for studying changes in media coverage and becuase news articles serve as a natural proxy for analyzing public discourse, media framing and shifts in perception over time.

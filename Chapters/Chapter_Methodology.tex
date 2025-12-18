@@ -98,6 +98,8 @@ To evaluate the proposed CorpusAgent pipeline beyond anecdotal demonstrations, w
 
 The questions were selected to cover diverse topical domains (politics, technology, finance, public health, climate discourse), different temporal dynamics (slow narrative shifts versus event-driven changes), and varying degrees of required tool composition. In addition, the set includes explicit negative and counterfactual controls to test robustness against spurious correlations and unsupported premises. This design reflects the dual objectives of demonstrating the analytical capabilities of the pipeline while also probing its reliability and interpretability properties.
 
+Most of the questions are temporal based and therefore require evidence aggregation across multiple years. Studies have demonstrated the value of longitudinal sentiment analysis in news corpora for tracking how emotional tenor and polarity evolve over extended periods \cite{10.1371/journal.pone.0276367}.
+
 \subsection{Question Categories}
 
 The evaluation questions are grouped into four categories, each targeting a specific capability of the system:
@@ -143,6 +145,8 @@ The questions in this category:
 
 \textbf{(D) Counterfactual / impossible-event controls.}
 Finally, a small set of plausible-sounding questions is included where the premise is false (i.e., the referenced event did not occur). This category tests whether the system can detect unsupported assumptions and respond conservatively. In such cases, a correct answer must explicitly flag the premise as incorrect or not supported by evidence, rather than attempting to "fill in" a narrative by hallucination.
+
+Concerns about model trustworthiness and explanation fidelity have been widely discussed in the machine learning literature, motivating the inclusion of negative and counterfactual questions to reduce overconfidence in model outputs \cite{ribeiro2016whyitrustyou}.
 
 The questions in this category:
 \begin{itemize}

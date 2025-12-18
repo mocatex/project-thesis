@@ -14,6 +14,32 @@
 % SECTION 1
 %----------------------------------------------------------------------------------------
 
+\section{Materials and Dataset}
+
+\subsection{Dataset Description}
+
+The experiments we conducted in this thesis are all based on a large scale news article corpus derived from the CC-News dataset, as made available through the Hugging Face repository \cite{ccnews}. The dataset consists of news articles crawled from a wide range of online news sources and spans a time period from 2016 to 2021, making it very suitable for longitudinal analysies of media narratives and public perception.
+
+The entirity of the dataset contains approximately 134 million rows of news articles, amounting to around 221 GB of compressed parquet files. Each entry in the dataset includes heading, publication year, source URL and a raw text field containing the article body. The articles cover a diverse set of topics, including politics, technology, finance, health, entertainment and more. The wide topical coverage and large scale of the dataset make it well-suited for analyzing trends and shifts in public discourse over time.
+
+For the purpose of this thesis, a reduced cross-section of this dataset was used. Approximately 10\% of the original corpus was sampled, resulting in our working dataset of roughly 13 million articles. The reduction was necessary to ensure feasible processing times and resource requirements. Given the exploratory nature of this thesis, the reduced dataset still provides sufficient coverage and diversity to evaluate the proposed system and conduct meaningful analyses.
+
+\subsection{Dataset Motivation}
+
+Our main objective with this thesis was to explore how LLMs can be effectively combined with classical NLP methods to answer complex, temporally-aware analytical questions over large text corpora. A news corpus was selected as the underlying data source both due to its relevance for studying changes in media coverage and becuase news articles serve as a natural proxy for analyzing public discourse, media framing and shifts in perception over time.
+
+Questions such as how the portrayal of a topic or the opinion on a public figure evolves across years, or how sentiment and narrative emphasis shift in response to major events are inherently temporal in nature. Therefore, large volumes of text spanning multiple time periods are required to capture these dynamics.
+
+Prior to selecting this CC-Newes corpus, alternative datasets such as the CNN/DailyMail corpus \cite{cnndailymail} were considered. However, these datasets were ultimately deemed less suitable due to the lack of reliable temporal metadata beyond article content and headlines, which limited their suitability for time-based analysis. While the selected CC-News dataset provides temporal information primarily at the year level rather than at a fine-grained date resolution, it still enables meaningful year-over-year comparisons and trend analyses, which aligns with the goals of this thesis.
+
+The suitability of news corpora for diachronic analysis has also been demonstrated in prior work. For example, Marjanen et al.~\cite{marjanen2020topic} apply topic modeling techniques to historical newspaper collections in order to study long-term discourse dynamics and shifts in dominant narratives over time. This supports our choice of a temporally structured news corpus as the empirical basis for a pipeline that combines classical topic-oriented analysis with LLM-based synthesis.
+
+\subsection{Dataset Variants / Preprocessing}
+
+The CC-News dataset has already undergone several preprocessing and quality assurance steps prior to its release. Non-English documents are removed and low quality content such as advertisements is filtered using heuristic methods. Additionally, the dataset is globally deduplicated and cross-deduplicated against external corpora such as OpenWebText2, resulting in the removal of approximately 0.3 million documents \cite{openwebtext2}. 
+
+
+
 \section{Overview of the Proposed System}
 
 \begin{figure}[ht]

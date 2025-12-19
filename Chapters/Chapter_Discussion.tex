@@ -1,0 +1,112 @@
+% !TEX root = ../main.tex
+%----------------------------------------------------------------------------------------
+
+\chapter{Discussion} 
+\label{ChapterDiscussion}
+%----------------------------------------------------------------------------------------
+
+\section{Reliability First: What the Control Experiments Tell Us}
+
+A core risk in LLM-assisted corpus exploration is that the system produces plausible narratives even when the underlying evidence is weak, absent, or based on a false premise. For this reason, the most informative results in Chapter~\ref{ChapterResults} are not the "headline" case studies, but the control experiments: the negative-control query (no real relationship expected) and the counterfactual controls (plausible question form, but factually incorrect premise). Together, these tests probe whether CorpusAgent behaves like an analytical system that can say "no" when appropriate, rather than a fluent text generator.
+
+\subsection{Negative Control: Avoiding Spurious Relationships}
+
+The Bitcoin–Colgate negative-control question is a direct test of whether the pipeline tends to invent cross-domain causal stories when presented with two time series that could, in principle, show coincidental co-movement. The key outcome is not simply that "no link was found." but how the system arrived there.
+
+The result suggests that CorpusAgent’s synthesis is constrained by retrieval grounding and tool-derived signals, rather than by the narrative pressure to produce a relationship. In practice, the system did not “force” an explanation through vague macroeconomic arguments (e.g., inflation, risk-on/risk-off) but instead relied on two grounded checks that are conceptually aligned with responsible longitudinal analysis:
+
+\begin{enumerate}
+    \item Content-level linkage - whether Colgate coverage actually contains recurring references to Bitcoin/crypto as an explanatory factor.
+    \item Discourse drivers - whether the dominant narratives in the retrieved documents are plausibly connected to crypto dynamics or are instead explained by firm/sector fundamentals (earnings, ratings, positioning).
+\end{enumerate}
+
+This is an important reliability property for large-corpus analytics, because time-series patterns are easy to over-interpret. If a system cannot resist spurious alignment, it becomes actively misleading. Especially when users ask “Did X cause Y?” in a period where many things move together.
+
+That said, the negative-control case also highlights a boundary that the system handled correctly: “no evidence of a link.” is not “proof of no link.” The response explicitly points to what a stronger causal test would require (event-window alignment or explicit mention indicators). This is not a weakness in the answer! It is a necessary distinction in empirical reasoning. \\
+In other words, the system demonstrates a useful form of scientific caution: it separates observed grounding (what the corpus supports) from claims of causality (which require additional data and methods). This aligns with the methodological framing in Chapter~\ref{ChapterMethodology}, where the system is positioned as an exploratory analysis assistant rather than a causal inference engine.
+
+\subsection{Counterfactual Controls: Premise Validation as a Safeguard}
+
+The counterfactual questions (AWS IPO in 2019 and Facebook rebrand to Meta in 2018) test a different failure mode: answering confidently when the question’s premise is factually wrong. This is a realistic user scenario since for exploratory tools, users often formulate questions from memory, rumors, or mixed timelines.
+
+The key behavior demonstrated in Chapter~\ref{ChapterResults} is premise validation before analysis. Instead of “running the pipeline anyway” and producing a post-hoc interpretation, CorpusAgent rejected the queries because the trigger event did not occur in the real world (and therefore cannot be meaningfully analyzed in a real-news corpus for that time window). From a system-design perspective, this safeguard matters for two reasons:
+
+\begin{itemize}
+    \item It prevents structurally invalid analyses. If the assumed event never happened, then any “before vs after” comparison is artificial. The system cannot fix that with better sentiment models or better topic clustering—the causal scaffold is simply missing.
+    \item It preserves trust through transparent refusal. A refusal with a concrete reason is preferable to a fluent answer with fabricated causal anchors. In exploratory settings, user trust is built more by reliable boundaries than by always producing output.
+\end{itemize}
+
+Taken together, the controls indicate that the current prototype encourages a conservative analytical stance:
+
+\begin{itemize}
+    \item It is willing to conclude “no systematic relationship supported” when evidence is missing (negative control).
+    \item It is willing to say “cannot answer as posed” when the question is built on a false premise (counterfactual controls).
+    \item It can articulate what would be needed to upgrade an exploratory conclusion into a stronger test (requirements for alignment and causal analysis).
+\end{itemize}
+
+This is a strong outcome for a system whose core value proposition is interactive analysis over large document sets. In many real deployments, reliability failures are not dramatic bugs. They are subtle overclaims that users only notice later. The control experiments demonstrate that the pipeline has mechanisms that reduce that risk.
+
+At the same time, these safeguards come with their own dependency: premise validation relies on external knowledge lookups and correct entity/event resolution. This means the safeguard is only as robust as the quality and coverage of the knowledge source and the system’s resolution logic. In later iterations (see Chapter~\ref{ChapterConclusion} / Future Work), this motivates treating premise validation as a first-class component with explicit logging and confidence reporting, rather than as an implicit “LLM intuition.”
+
+%----------------------------------------------------------------------------------------
+
+\section{Cross-Cutting Strengths of the System}
+
+Beyond individual case outcomes, the results in Chapter~\ref{ChapterResults} reveal several system-level strengths that recur across very different question types. These strengths are not tied to a specific topic (politics, markets, public health), but to how CorpusAgent structures and executes analysis over large, longitudinal corpora.
+
+\subsection{End-to-End Analytical Autonomy}
+
+Across all evaluated questions, the system consistently operated in an end-to-end manner. It transformed a natural-language query into an analytical plan, selected appropriate tools, executed them, and synthesized a usable narrative supported by figures. From a discussion perspective, the key point is not that each individual step is novel, but that the integration is automated and adaptive.
+
+Compared to static dashboards or predefined pipelines, this autonomy allows the system to handle open-ended research questions without requiring the user to manually specify time horizons, entities, or analytical steps. This is particularly relevant for exploratory corpus analysis, where the “right” analysis is often not known in advance. The results show that the agent reliably identifies whether a question calls for trend analysis, framing comparison, or event-focused segmentation, which supports the design choices described in Chapter~\ref{ChapterMethodology}.
+
+\subsection{Temporal Structuring as a Default Reasoning Strategy}
+
+A second recurring strength is the system’s use of temporal structuring. Rather than treating time as a simple index, the agent frequently segments the analysis into phases (e.g., pre- and post-event periods, outbreak versus rollout phases, campaign versus presidency). This behavior appears across multiple case studies and is aligned with how humans reason about longitudinal phenomena.
+
+From a discussion standpoint, this matters because temporal segmentation enables interpretation rather than mere description. Phase-based reasoning helps explain why patterns change, not just that they change. At the same time, the results also expose a limitation: when temporal aggregation is too coarse (e.g., yearly summaries), phase boundaries can blur. The system partially compensates for this by requesting finer-grained or event-aligned capabilities, indicating awareness of its own resolution limits. The limiting factor in our thesis was the underlying dataset's temporal granularity, which only provided yearly timestamps.
+
+\subsection{Multi-Signal Synthesis Instead of Single-Metric Answers}
+
+Another clear strength is the system’s tendency to combine multiple analytical signals rather than relying on a single metric. Sentiment is frequently complemented by volatility measures, burst detection, topic dynamics, framing analysis, or stance detection. This is visible in both political and corporate case studies.
+
+This behavior is important because many interpretive failures in media analysis arise from over-reliance on a single indicator (for example, assuming that negative sentiment alone implies negative impact). The results suggest that CorpusAgent treats individual metrics as partial views and attempts to integrate them into a broader explanatory frame. Notably, when existing tools are insufficient the system explicitly signals the need for additional capabilities instead of silently approximating the answer.
+
+\subsection{Awareness of Heterogeneity Across Sources}
+
+Finally, the results demonstrate that the system does not assume uniformity across the corpus. In cases where regional or outlet-type differences are relevant, the agent selects source-comparison or stance-related tools and incorporates heterogeneity into the interpretation.
+
+This has a noticable impact, as aggregate trends can easily obscure polarization or systematic bias across media segments. By surfacing differences across regions and outlet types, the system supports more nuanced conclusions and reduces the risk of overgeneralization. At the same time, this capability depends on the availability and quality of source metadata, a dependency that becomes relevant when discussing limitations in later sections.
+
+%----------------------------------------------------------------------------------------
+
+\section{Interpretation of the Core Case Studies}
+
+Looking across the main case studies in Chapter~\ref{ChapterResults}, clear patterns emerge in how CorpusAgent handles complex, long-term analysis tasks. Even though the topics differ, the system applies similar reasoning strategies, which helps to assess its overall behavior rather than the outcome of any single example.
+
+First, the results show that the system does not treat matching timelines as automatic evidence of a relationship. In several cases, changes in media sentiment or framing occur at the same time as external events, but the system does not assume a direct link by default. Instead, it interprets alignment as dependent on whether events have clear economic, political, or institutional relevance. This leads to more careful conclusions and avoids overstating connections that may only be coincidental.
+
+Second, the analyses rely more on framing and topic changes than on sentiment values alone. Sentiment scores are used as a general indicator, but they are rarely sufficient to explain what is happening in the media. By looking at how narratives shift over time the system can explain why similar sentiment levels may reflect very different kinds of coverage. This supports a more meaningful interpretation of media discourse.
+
+The case studies also show that the system organizes time into phases rather than treating it as a continuous stream. Breaking long periods into stages (for example, before and after major events) helps explain how coverage evolves. However, this approach depends on the chosen time resolution. When data is aggregated too broadly, short but important developments can be missed. The system partly addresses this by noting when finer time-based analysis would be necessary.
+
+Finally, the system consistently acknowledges differences within the media landscape and its own limits. It highlights variation across outlets and regions instead of averaging everything into a single trend, and it clearly states when the available evidence does not support strong conclusions. This behavior strengthens its usability as an exploratory analysis tool, where understanding uncertainty is as important as identifying patterns.
+
+%----------------------------------------------------------------------------------------
+
+\section{Limitations and Design Trade-offs}
+
+While the results demonstrate several strengths of CorpusAgent, they also reveal clear limitations that are important for correctly interpreting the findings. These limitations are not implementation mistakes but design trade-offs that reflect the current prototype stage of the system.
+
+A first and central limitation is the use of mocked NLP tools. In this thesis, the tools are not evaluated for their empirical accuracy but for their role within the analytical pipeline. As a result, the reported sentiment, topic, or framing outputs should not be interpreted as ground-truth measurements. Instead, they demonstrate how such signals can be orchestrated, combined, and explained by an LLM-driven agent. This means the evaluation focuses on system behavior and integration, rather than on the quality of individual NLP models.
+
+A second limitation concerns temporal granularity. Most analyses rely on yearly aggregation, which is sufficient for identifying broad trends but inadequate for short-term dynamics or event-based alignment. This affects questions involving market reactions or sudden framing shifts, where daily or weekly resolution would be more appropriate. The system partly compensates for this by explicitly requesting finer-grained or event-aligned capabilities, but these are not yet implemented in the prototype.
+
+The system is also constrained by retrieval and metadata quality. All analyses depend on which documents are retrieved from the corpus and on the availability of reliable metadata such as publication date, outlet, or region. Missing or noisy metadata can bias aggregated results or limit source-level comparisons. While the system can surface uncertainty in its synthesis, it cannot correct for systematic gaps in the underlying data.
+For example, as mentioned earlier, the dataset used in this thesis only provides yearly timestamps, which limits the temporal resolution of the analyses.
+
+Another important trade-off lies in modeling choices for sentiment, framing, and stance. These concepts are inherently abstract and difficult to measure automatically. Sentiment models may conflate critical reporting with negativity, while framing and stance detection depend on clear definitions that may vary across contexts. The system treats these signals as approximate indicators rather than precise measurements, but this uncertainty must be kept in mind when interpreting the results.
+
+Finally, external signal alignment (such as stock prices or volatility indices) is only partially supported. The system can identify when such alignment would be analytically meaningful and request the corresponding capability, but it does not yet perform these analyses directly. As a result, conclusions involving market responses remain qualitative rather than quantitatively tested.
+
+Overall, these limitations highlight that the current system should be understood as a proof of concept for LLM-assisted corpus exploration. Its main contribution lies in how analyses are planned, combined, and explained, rather than in producing fully validated empirical measurements.

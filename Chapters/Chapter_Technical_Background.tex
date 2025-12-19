@@ -1,0 +1,155 @@
+% Indicate the main file. Must go at the beginning of the file.
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------------------------
+% CHAPTER TECHNICAL BACKGROUND
+%----------------------------------------------------------------------------------------
+
+\chapter{Technical Background}
+\label{ChapterTechnicalBackground}
+
+%----------------------------------------------------------------------------------------
+
+\section{Challenges in Large-Scale Text Corpus Analysis}
+
+Large-scale text corpora, such as news archives, web crawls, or social media collections, have become indispensable sources for understanding social discourse, public perception, and temporal dynamics across domains. Their volume, however, lead non-trivial methodological and technical challenges for extraction of high-level insights.
+
+\subsection{Scala and Volume}
+
+The size of contemporary textual corpora can render traditional manual or small-scale qualitative approaches infeasible. In studies of social media or news media, researchers have noted that large corpora both enable and constrain analysis, as simple text retrieval and manual content inspection become impractical without automated processing pipelines \cite{moreno2023strategies}. Computational infrastructure and scalable indexing are required to manage terabytes of raw text and to support iterative exploratory workflows.
+
+\subsection{Fragmentation Across Sources and Time}
+
+Unlike carefully curated datasets, real-world corpora are often heterogeneous in source, format, and temporal coverage. This fragmentation complicates cross-source and longitudinal analyses, where differences in publication norms, metadata standards, or archive completeness can bias results unless explicitly addressed. Fragmentation also increases the complexity of defining consistent temporal units (e.g., weeks, months, phases) across different collections.
+
+\subsection{Temporal and Comparative Analysis Challenges}
+
+Understanding how narratives evolve over time (for example, how sentiment or topic distributions shift across years or in response to events) demands methods that can extract macroscopic patterns from massive text sequences \cite{lansdall2018history}. Classical retrieval or simple keyword counts might indicate presence or absence of terms, but temporal dynamics requires scalable trend detection and segmentation algorithms that can operate over millions of documents and across long time spans. Simple frequency analysis may misrepresent underlying shifts due to seasonality or publication rate variations.
+
+\subsection{Limits of Manual Qualitative Analysis}
+
+Traditional content and discourse analysis in fields such as journalism relies heavily on human interpretation of text. When your corpora scale gets beyond a few thousands documents, such manual techniques become prohibitively time-consuming and prone to inconsistency. This underscores the need for computational methods that can provide reproducible, scalable, and interpretable summaries and metrics without replacing human insight entirely.
+
+%----------------------------------------------------------------------------------------
+
+\section{Classical Information Retrieval and Text Analysis Pipelines}
+
+Before the rise of large language models and neural reasoning systems, classical information retrieval (IR) and text analysis were the core methods for extracting relevant information from large text corpora. These systems are optimized for scalable keyword matching and ranking, but they fundamentally lack mechanisms for higher-level synthesis or narrative reasoning.
+
+At the core of most classical IR systems is the inverted index, a data structure that maps terms to the documents in which they appear. An inverted index enables efficient lookup of documents containing particular keywords, and it forms the backbone of virtually all large-scale search systems and full-text search engines \cite{ir_inverted_index}. By precomputing term-to-document mappings, inverted indices allow queries to be answered in time proportional to the number of matching documents rather than the size of the entire corpus.
+
+Traditional IR systems differ from generic relational database (RDB) text search in both structure and performance. While many RDBMS support text search through full-text indices or simple keyword matching functions, they do not implement inverted indices with optimized postings lists and ranking functions, and they typically scale poorly as corpus size increases. Search engines and dedicated IR libraries implement query processing, ranking, and caching strategies that deliver both higher precision and better performance on large document collections.
+
+These classical approaches have several operational strengths. Because they rely on well-understood algorithms and data structures, they offer predictable scalability to millions or billions of documents, reproducible results under identical query setups, and transparent ranking heuristics that can be interpreted or tuned by system designers. They support keyword matching and partial boolean logic constructs that make them suitable for applications where exact text occurrences are the primary retrieval signal.
+
+At the same time, classical IR systems have important limitations. Keyword rankings mainly measure term overlap and rarity, so they do not produce narrative explanations or capture deeper meaning beyond surface words. These systems can return lists of likely documents, but they do not summarize results, compare trends, or reason about changes over time. They also miss relevant content when queries use different wording than the documents (vocabulary mismatch) unless combined with methods like query expansion or semantic re-ranking \cite{ir_retrieval_semantic}. For these reasons, IR alone is not sufficient as the final analytic layer for the complex, longitudinal questions addressed in this thesis.
+
+%----------------------------------------------------------------------------------------
+
+\section{Longitudinal and Temporal Analysis of News Corpora}
+
+Analyzing how text changes over time is a central concern when working with large news corpora. This type of analysis is often referred to as diachronic analysis and involves studying patterns in language use, sentiment, topic prevalence, or framing across years, months, or other time intervals. In contrast to static or synchronic analysis, which examines text at a single point, diachronic approaches seek to uncover how content evolves and what that evolution might signify in terms of social, political, or cultural trends.
+
+A diachronic corpus is defined as a collection of documents that are associated with timestamps spanning an extended period. Such corpora enable retrospective retrieval and temporal pattern study, as text from different time periods can be directly compared to identify trends in usage, topics, or sentiment \cite{ir_temporal_ir}. These temporal corpora are common in news analytics research, with examples ranging from multi-decade newspaper archives to structured headline collections used in sentiment dynamics studies \cite{10.1371/journal.pone.0276367}.
+
+One important area of longitudinal analysis is understanding how narratives and frames change over time. In media and communication research, framing refers to the way information is presented and structured by news sources. Frame analysis has roots in social science and shows that the same issue can be described differently depending on context, emphasis, or intent, and that these representations shape audience interpretation \cite{frame_analysis_wikipedia}.
+
+Another dimension of longitudinal analysis is topic or semantic shift detection. Over long time spans, not only do the topics covered by news outlets change, but the meanings of words and associations between concepts can shift. Computational methods for measuring such semantic change include diachronic word embeddings and time series models, which quantify how word contexts evolve in large corpora \cite{dukic2025characterizing}. These methods highlight that diachronic analysis can extend beyond simple counts and into deeper semantic dynamics.
+
+Overall, longitudinal and temporal analysis of news corpora provides a systematic way to track change and compare narrative features across time. This type of analysis underlies many of the evaluation questions defined in this thesis, where changes in sentiment, topic distribution, or framing over years serve as the primary evidence for answering analytical queries.
+
+
+%----------------------------------------------------------------------------------------
+\section{Large Language Models}
+
+Large Language Models (LLMs) are neural network–based systems trained on very large text corpora to perform language tasks such as generation, summarization, and reasoning over text. They are built on modern architectures that allow them to capture linguistic patterns and semantic relationships from vast datasets, making them powerful tools for natural language understanding and synthesis \cite{large_language_model_wikipedia}.
+
+\subsection{Capabilities Relevant to This Thesis}
+
+LLMs are particularly useful for synthesizing information across documents and producing coherent natural-language outputs based on structured inputs. For example, they can summarize long passages of text, identify central themes, and abstract key points from varied sources, supporting tasks such as literature review, topic interpretation, and summarization of complex content \cite{bigoulaeva2025inherent}\cite{what_are_llms_ibm}. In the context of this thesis, these capabilities enable the model to:
+\begin{itemize}
+    \item Transform structured analysis results (e.g., sentiment scores, topic distributions) into natural-language narratives.
+    \item Integrate multi-stage analytic outputs into a unified answer that reads coherently and is easy for humans to interpret.
+    \item Follow natural language instructions in prompts to guide how synthesis should proceed.
+\end{itemize}
+
+This makes LLMs valuable as a reasoning and explanation layer in an analytics pipeline: they go beyond keyword matching or quantitative metrics (like IR) to produce human-readable explanations of aggregated patterns.
+
+\subsection{Limitations}
+
+Despite their strengths, LLMs have known limitations that are important to consider in analytical systems. One fundamental constraint is the \textit{context window}: \\
+LLMs can only process a limited number of tokens at once, making them unsuitable for analyzing large corpora directly without pre-processing or structured intermediate representations \cite{large_language_model_wikipedia}. Additionally, LLMs can produce outputs that appear plausible but are not grounded in the source data, a phenomenon known as \textit{hallucination}, especially in multi-document summarization tasks \cite{belem2025singlemultillmshallucinate}. These limitations mean that LLMs are best used in combination with structured retrieval and analysis components that provide them with relevant, condensed inputs rather than raw corpora.
+
+By combining LLM capabilities with classical retrieval and analytic methods, a hybrid pipeline can leverage the strengths of both. Scalable preprocessing and indexing from classical approaches, and flexible synthesis and explanation from LLMs.
+
+%----------------------------------------------------------------------------------------
+
+\section{Retrieval-Augmented Generation and Related Architectures}
+
+As large language models (LLMs) became practical for real-world use, researchers and practitioners developed hybrid approaches that combine retrieval mechanisms with some form of generation or reasoning. These tools aim to mitigate known limitations of standalone LLMs by grounding model outputs in external sources. Among these, Retrieval-Augmented Generation (RAG) has emerged as a prominent pattern, but it is not the only retrieval-based method in the landscape.
+
+\subsection{Standard RAG Architecture}
+
+Retrieval-Augmented Generation refers to architectural patterns in which a language model’s generation step is explicitly augmented with text retrieved from an external source at the time of query. Instead of relying solely on the model’s pretrained weights, RAG systems first retrieve relevant documents from a knowledge base or corpus, and then incorporate those texts as context for answer generation \cite{rag_wikipedia}\cite{what_is_rag_ibm}.  \\
+This workflow typically consists of three high-level stages: (1) retrieval: locating relevant passages or documents, (2) augmentation: use these retrieved texts as additional conditioning context, and (3) generation: using the LLM to produce a response that combines retrieved evidence with the model’s own knowledge \cite{rag_wikipedia}.
+
+The motivation behind RAG is to expand the knowledge available to the generative model without retraining it whenever new or domain-specific information becomes available. By indexing external sources and retrieving them at query time, RAG systems can produce outputs that are more accurate, up-to-date, and contextually grounded than generation based solely on pretrained parameters \cite{rag_openai}.
+
+\subsection{Related Retrieval-Based Architectures}
+
+Beyond RAG, several related architectures leverage retrieval to enhance language model capabilities. These include:
+\begin{itemize}
+    \item \textbf{Semantic Search:} Semantic search systems use vector-based retrieval to find documents that are semantically similar to a query, often using embeddings generated by LLMs themselves.
+    \item \textbf{Hybrid Retrieval Systems:} These systems combine traditional keyword-based retrieval with semantic or embedding-based methods to improve recall and relevance.
+    \item \textbf{Modular RAG Variants:} Some RAG implementations separate retrieval and generation more distinctly, allowing for different models or algorithms to be used at each stage, or incorporating multiple retrieval passes.
+    \item \textbf{Orchestration Frameworks:} These frameworks manage complex workflows that involve multiple retrieval and generation steps, often integrating external tools or APIs to enhance reasoning capabilities.
+\end{itemize}
+
+\subsection{Strengths in Context}
+
+These retrieval-enhanced models and tools share some common strengths:
+
+\begin{itemize}
+    \item By leveraging up-to-date external sources, they can produce outputs that are more accurate than relying on static model parameters \cite{what_is_rag_ibm}.
+    \item They enable integration of domain-specific or proprietary content without retraining the LLM.
+    \item Retrieval components can increase the chance that generated responses reference evidence relevant to the query.
+\end{itemize}
+
+\subsection{Limitations Relative to Corpus-Level Analysis}
+
+Despite the advantages of retrieval-based approaches like Retrieval-Augmented Generation (RAG), these systems still have limitations that affect their usefulness for broad corpus analysis. RAG depends heavily on the quality and organisation of the external data it retrieves; if the underlying database contains outdated, irrelevant, or poorly indexed information, the retrieved context may be insufficient or misleading, and generated outputs can reflect these issues \cite{blog_rag_vs_buzz}. Even with retrieval, language models can still produce inaccurate or hallucinated responses if they misinterpret or overgeneralise from the retrieved text, because grounding does not guarantee correct interpretation \cite{rag_wikipedia}. \\
+Furthermore, RAG systems are optimised to fetch a limited set of relevant documents per query rather than to summarise patterns across an entire corpus, which makes them less suitable for tasks that require aggregation over large document sets or comparison of trends over time. In addition, the retrieval process itself has challenges such as handling ambiguous queries.\cite{rag_problems_ibm}.
+
+Because of these constraints, retrieval-enhanced architectures like RAG are effective for factually grounded, single-query tasks but are not designed to provide the structured, corpus-wide temporal reasoning required in the analyses pursued in this thesis.
+
+%----------------------------------------------------------------------------------------
+
+\section{Related Work and Research Prototypes}
+
+There are a variety of tools and systems aimed at helping users explore, analyze, or visualize large text collections. These range from interactive news analytics dashboards to visual analytics systems for document sets, and from corpus exploration interfaces to research prototypes that combine visual and interactive components with natural language processing.
+
+One example is interactive dashboards built for news sentiment analysis. These systems fetch articles through APIs, apply sentiment analysis models like VADER, and present time-series trends, topic distributions, and word-based visualizations through interactive graphs and charts \cite{sentiment_dashboard_ijcrt}. \\
+Such dashboards are useful for exploring real-time or recent sentiment trends and for gaining a quick overview of important themes in a narrow topic area. However, these tools rarely support deep, multi-stage analytical workflows that combine scalable retrieval, advanced temporal aggregation, and narrative synthesis.
+
+Another class of tools focuses on visual analytics for document collections beyond simple dashboards. Systems like VICTORIOUS offer modules to support sensemaking for scoping reviews: users upload a set of documents, and the system provides topic maps, clustering, and interactive views to assist classification and assessment \cite{victorious2025visual}.
+
+While such tools advance exploratory interaction over document sets, they are generally designed for curated subsets of data rather than for large, unfiltered corpora spanning long time periods.
+
+There are also open source tools developed for corpus linguistics and text exploration. Voyant Tools is a web-based application that offers simple frequency lists, distribution plots, and word pattern analysis for uploaded corpora, making it suitable for small- to medium-scale text exploration \cite{voyant_tools_wikipedia}. Similarly, R packages such as corporaexplorer provide interactive interfaces to browse and examine collections of text, but they require pre-prepared corpora and do not integrate large-scale retrieval or analytic pipelines \cite{corporaexplorer}. These tools are useful for linguistic studies or exploratory analysis, but they do not typically support structured temporal reasoning or hybrid LLM-assisted synthesis.
+
+In the research literature, there are prototypes that combine visualization with deeper text analysis. For example, CARTOLABE is a web-based visualization framework for navigating large textual corpora through topic projections and interactive semantic maps, enabling users to explore patterns at multiple scales \cite{cartolabe2020web}. Tools like TextEssence support interactive comparative analysis of semantic changes between corpora using word embeddings, offering visual insights into shifts between document sets \cite{textessence2021tool}. \\
+More recent work, such as VisPile, integrates LLMs and knowledge graphs into visual analytics systems that assist analysts in grouping documents and validating evidence interactively \cite{vispile2025visual}. These systems show how visualization and AI can help with complex analysis tasks, but they are often designed for specific research scenarios or require expert users, and they do not directly address longitudinal narrative synthesis over very large news corpora.
+
+Beyond research prototypes, commercial or industry-oriented tools such as Pulsar provide social listening and audience intelligence, combining text analytics with trend detection and visual reporting across news and social media sources \cite{pulsar_wikipedia}. These platforms excel at real-time monitoring and broad narrative detection over multiple channels, but they are typically closed systems with limited transparency into intermediate analytic steps and without custom pipeline orchestration.
+
+In summary, related systems offer valuable features such as sentiment tracking, interactive corpus exploration, and visual analytics. They excel at exploratory data analysis, visualization, and narrow-scope trend detection. However, they generally do not combine scalable retrieval of large corpora, structured analytic signal extraction, and LLM-based narrative reasoning into a cohesive workflow capable of systematic longitudinal analysis. This gap motivates the design of the hybrid pipeline presented in this thesis.
+
+%----------------------------------------------------------------------------------------
+
+\section{Summary and Positioning of This Work}
+
+In this chapter, we reviewed the technical foundations that underpin the design of this thesis. We began with the challenges of working with large-scale text corpora and why traditional manual analysis or simple retrieval is inadequate for answering temporally structured, narrative questions. We then outlined classical information retrieval principles and highlighted the strengths and limits of modern hybrid tools that combine retrieval with generative models. Finally, we surveyed related systems from interactive dashboards and corpus exploration tools to research prototypes that integrate visual and analytic components.
+
+Existing systems are well suited for specific facets of text analysis, such as keyword search, visual exploration of moderate-size collections, or grounded question answering over a small set of documents. However, we found no tool that currently combines scalable corpus-wide retrieval, structured analytic signal extraction, and natural-language narrative synthesis in a unified, reproducible workflow. In particular, most retrieval-enhanced systems target per-query factual grounding rather than longitudinal, cross-document pattern analysis, which is central to the questions this thesis seeks to address.
+
+The preceding survey therefore motivates the need for a hybrid architecture that leverages the scalability and precision of classical methods together with the abstraction and summarization capabilities of large language models, while preserving transparency and traceability of intermediate results.

@@ -10,6 +10,8 @@
 
 \label{ChapterResults} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
+This chapter presents the results obtained from applying the proposed LLM-driven analytical framework to a longitudinal media analysis task. The system was evaluated on its ability to autonomously generate analytical plans, execute NLP toolchains, and synthesize findings in response to complex temporal research questions.
+
 %----------------------------------------------------------------------------------------
 % SECTION 1
 %----------------------------------------------------------------------------------------
@@ -49,15 +51,13 @@ The following NLP tools were available to the system during execution. All tools
 
 \section{Core longitudinal Questions}
 
+This subsection presents a case study demonstrating how the proposed system responds to a complex temporal analysis question. The section first states the user query, followed by the system-generated summary and the resulting analytical outputs. Supporting figures and an agentic reasoning trace illustrate how the system decomposed the task, selected analytical tools, and synthesized the final result.
+
 \subsection{Media Sentiment towards Donald Trump and Market Volatility}
 
 \paragraph{User Query}
 
 \textit{"How did media sentiment towards Donald Trump evolve from the 2016 campaign through his presidency, and how did these sentiment patterns relate to periods of heightened US equity-market volatility?"}
-
-\paragraph{Research Question}
-
-This analysis examines how media sentiment toward Donald Trump evolved from the 2016 campaign through his presidency (2016–2020), and how these sentiment patterns related to periods of heightened US equity-market volatility.
 
 \paragraph{System-Generated Summary}
 The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
@@ -70,6 +70,8 @@ The qualitative reporting links those sentiment shifts to equity-market volatili
 
 \paragraph{Analytical Results}
 
+The following results describe the outputs produced by the proposed system when applied to this question, illustrating how the framework translates large-scale media analytics into a coherent temporal narrative.
+
 Media sentiment toward Donald Trump was predominantly negative throughout the period 2016–2020, with substantial year-to-year variation. Sentiment was strongly negative in 2016 and 2017, shifted to a positive annual mean in 2018, and returned to strongly negative levels in 2019 before moderating slightly in 2020. Across all years, sentiment volatility was high and burst detection identified pronounced spikes in coverage between 2017 and 2020.
 
 \paragraph{Relationship to Market Volatility}
@@ -78,28 +80,372 @@ Periods of heightened negative or uncertain media coverage sometimes coincided w
 
 However, the relationship was not uniform. In 2017, negative political coverage coexisted with relatively subdued realized market volatility, suggesting a disconnect between political sentiment and immediate equity-market reactions. This indicates that negative media sentiment does not consistently translate into realized volatility and that market responses depend on the perceived economic relevance of events.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{Figures/sentiment_boxplot_by_year_a1_question.png}
-    \caption{Media Sentiment toward Donald Trump (2016–2020) and US Equity-Market Volatility}
-    \label{fig:media_sentiment_trump_market_volatility}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Figures/sentiment_boxplot_by_year_a1_question.png}
+        \caption{Sentiment distribution by year}
+        \label{fig:trump_sentiment_boxplot}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Figures/sentiment_mean_by_year_a1_question.png}
+        \caption{Mean sentiment by year}
+        \label{fig:trump_sentiment_mean}
+    \end{subfigure}
+
+    \caption{Media sentiment toward Donald Trump (2016–2020).}
+    \label{fig:trump_sentiment_combined}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{Figures/sentiment_mean_by_year_a1_question.png}
-    \caption{Mean Media Sentiment toward Donald Trump (2016–2020) and US Equity-Market Volatility}
-    \label{fig:media_sentiment_trump_market_volatility_mean}
-\end{figure}
-
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{Figures/topic_counts_by_year_a1_question.png}
-    \caption{Topic Counts Related to Donald Trump (2016–2020)}
+    \caption{Topic counts related to Donald Trump (2016–2020).}
     \label{fig:topic_counts_trump}
 \end{figure}
 
+Figure~\ref{fig:trump_sentiment_combined} shows the distribution and yearly mean of media sentiment toward Donald Trump, while Figure~\ref{fig:topic_counts_trump} illustrates the temporal evolution of dominant topic categories. These visualizations were fully planned and generated by the system.
+
+\paragraph{Analytical Workflow}
+For this analysis, the system functioned as an autonomous agent to decompose the research question into a multi-step analytical execution plan. As showin in Table~\ref{tab:agentic_reasoning}, the agent identified the task type, time horizon, execution logic, selected tools, and requested capabilities to fulfill the analysis.
+
+Notably, the system’s internal reasoning (the explanation field) recognized that sentiment volatility alone was insufficient and proactively suggested a "market-alignment" tool to bridge the gap between media bursts and equity-market fluctuations (VIX/S\&P). This demonstrates the pipeline's ability to not only retrieve data but to contextualize political events as market-relevant risk factors.
+
+\begin{table}[h!]
+\centering
+\caption{Agentic Reasoning Trace and Tool Selection Logic}
+\label{tab:agentic_reasoning}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{0.25\textwidth} p{0.7\textwidth}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Agent Execution Details} \\ \midrule
+\textbf{Task Type} & Exploratory Analysis \\
+\textbf{Time Horizon} & 2016--2020 \\
+\textbf{Execution Logic} & Compute entity-focused media sentiment and its volatility, segmenting the period into campaign/presidency phases. Detect bursts around key dates to align sentiment shifts and extract topic trends to identify drivers of change. \\
+\textbf{Selected Tools} & \begin{itemize}[nosep, leftmargin=*]
+    \item \texttt{sentiment\_over\_time}, \texttt{volatility\_of\_sentiment}
+    \item \texttt{temporal\_segmentation}, \texttt{burst\_detection}
+    \item \texttt{topic\_trend\_over\_time}
+    \item \texttt{confidence\_scoring\_of\_results}
+\end{itemize} \\
+\textbf{Requested Capability} & \textit{market\_volatility\_alignment}: To perform event-window correlation and regression analyses between sentiment measures and VIX/S\&P 500 returns. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+A more detailed breakdown of the system's stepwise analytical plan is provided in the Appendix.
 
 \paragraph{Summary}
 
 In summary, media sentiment toward Donald Trump was consistently volatile and largely negative across his presidency, but its alignment with equity-market volatility was episodic rather than systematic. Media sentiment and market volatility aligned most clearly during periods where political events had direct economic implications, while purely political controversies often showed weaker or no immediate market response.
+
+From a system perspective, this result demonstrates the framework’s ability to combine sentiment trends, topic dynamics, and burst detection to produce a nuanced answer that distinguishes between episodic and sustained alignment with external signals.
+
+\subsection{Facebook Framing Shift and Stock Performance Around Cambridge Analytica}
+
+\paragraph{User Query}
+
+\textit{"How did Facebook coverage shift from innovation/growth framing to privacy/regulation framing around the Cambridge Analytica scandal (2016–2019), and how did this correspond to FB stock drawdowns?"}
+
+\paragraph{System-Generated Summary}
+The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
+
+\begin{quote}
+Media framing shifted from an innovation and growth emphasis toward a dominant privacy and regulation frame between 2017 and 2019, with the most pronounced pivot occurring in 2018 following the Cambridge Analytica revelations. This framing transition coincided with major negative market reactions, including sharp one-day valuation losses and prolonged drawdowns as regulatory risk became a central concern in coverage.
+\end{quote}
+
+\paragraph{Analytical Results}
+
+Media coverage of Facebook exhibited a clear temporal shift in dominant framing between 2016 and 2019. Early coverage in 2016 and 2017 remained relatively balanced, combining innovation- and growth-oriented narratives with emerging regulatory discussions driven by data protection concerns. While regulation was present in this period, it was framed primarily as a manageable compliance issue rather than a systemic threat.
+
+In 2018, the Cambridge Analytica revelations marked a decisive turning point. Framing analysis shows a sharp rise in privacy, ethics, and regulatory narratives, accompanied by increased crisis-oriented language. Coverage during this period focused on data misuse, political manipulation, and institutional accountability, displacing earlier innovation-centric narratives. In 2019, privacy and regulation frames remained elevated, indicating that the shift was persistent rather than event-specific.
+
+\paragraph{Relationship to Stock Performance}
+
+The observed framing shift coincided with substantial negative stock-market reactions reported in the contextual summaries. The initial Cambridge Analytica disclosures in 2018 were associated with an immediate and pronounced loss in market value, while subsequent regulatory developments and disclosures contributed to further large drawdowns later in the year. In 2019, continued regulatory scrutiny and legal settlements were linked to additional sharp, short-term market-value declines, followed by only limited positive reactions to regulatory resolution.
+
+Taken together, the results suggest that the transition from innovation-focused to regulation-dominated media coverage corresponded with a re-evaluation of Facebook’s risk profile by financial markets. While innovation narratives had previously supported optimistic valuation expectations, sustained regulatory framing introduced long-term uncertainty that was reflected in market reactions.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Figures/keyword_trends_facebook.png}
+        \caption{Keyphrase trends related to Facebook (2016–2019)}
+        \label{fig:facebook_keyword_trends}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Figures/topic_shares_facebook.png}
+        \caption{Topic shares related to Facebook (2016–2019)}
+        \label{fig:facebook_topic_shares}
+    \end{subfigure}
+
+    \caption{Media sentiment toward Facebook (2016–2019).}
+    \label{fig:facebook_media_coverage}
+\end{figure}
+
+\pagebreak
+
+\paragraph{Analytical Workflow}
+
+To address this question, the system decomposed the task into a comparative temporal analysis spanning pre-scandal, scandal, and post-scandal phases. It autonomously selected framing-shift detection, topic trend analysis, and keyphrase evolution tracking to identify narrative changes over time. Event detection and temporal segmentation were used to isolate the Cambridge Analytica outbreak period, while named-entity tracking quantified changes in Facebook-related coverage volume.
+
+As shown in Table~\ref{tab:agentic_reasoning_facebook}, the system identified the task type, time horizon, execution logic, selected tools, and requested capabilities to fulfill the analysis.
+
+\begin{table}[h!]
+\centering
+\caption{Agentic Reasoning Trace and Tool Selection Logic for Facebook Framing Analysis}
+\label{tab:agentic_reasoning_facebook}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{0.25\textwidth} p{0.7\textwidth}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Agent Execution Details} \\ \midrule
+\textbf{Task Type} & Comparative Temporal Analysis \\
+\textbf{Time Horizon} & 2016--2019 \\
+\textbf{Execution Logic} & Detect shifts from innovation and growth framing toward privacy and regulation framing by analyzing topic prevalence, keyphrase evolution, and framing signals over time. Identify the Cambridge Analytica outbreak period and compare pre- and post-event media dynamics while tracking Facebook mention volume to contextualize changes in market perception. \\
+\textbf{Selected Tools} & \begin{itemize}[nosep, leftmargin=*]
+    \item \texttt{framing\_shift\_detection}
+    \item \texttt{keyphrase\_evolution\_tracking}
+    \item \texttt{topic\_trend\_over\_time}
+    \item \texttt{event\_detection}
+    \item \texttt{temporal\_segmentation}
+    \item \texttt{named\_entity\_trend\_tracking}
+\end{itemize} \\
+\textbf{Requested Capability} & \textit{stock\_drawdown\_detection\_and\_alignment}: Tool to ingest Facebook stock price series, compute drawdown timing and magnitude, and align drawdown intervals with media framing and topic signals for quantitative market correlation. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+A detailed breakdown of the system's stepwise analytical plan is provided in the Appendix.
+
+\paragraph{Summary}
+
+In summary, media coverage of Facebook shifted decisively from innovation and growth narratives toward privacy and regulatory framing following the Cambridge Analytica scandal. This reframing coincided with pronounced negative stock-market reactions and sustained valuation pressure, indicating that regulatory and ethical concerns became central drivers of both media discourse and market perception during this period.
+
+
+\subsection{Media Framing of COVID-19 from Outbreak to Vaccine Rollout}
+
+\paragraph{User Query}
+
+\textit{"How did media tone and dominant framing around COVID-19 evolve from the initial outbreak through vaccine rollout (late 2019–2021), and how did public-health, economic, and civil-liberty frames compete over time?"}
+
+\paragraph{System-Generated Summary}
+The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
+
+\begin{quote}
+Media coverage of COVID-19 evolved from an initial public-health crisis framing in late 2019 and early 2020 toward a strongly innovation- and solution-oriented narrative during 2020, dominated by vaccine research and development. Despite the ongoing pandemic, overall sentiment in 2020 was unusually positive in the aggregated analytics. During 2021, sentiment declined and coverage became more conflicted, with increasing emphasis on regulation, civil-liberty debates, and economic reopening alongside continued public-health concerns.
+\end{quote}
+
+\paragraph{Analytical Results}
+
+Media sentiment and framing around COVID-19 exhibited distinct temporal phases between late 2019 and 2021. Early coverage during the outbreak period was characterized by an urgent risk and crisis tone, focusing on epidemiology, containment measures, and immediate public-health threats. As the pandemic progressed through 2020, aggregated sentiment shifted markedly toward positive values, coinciding with increased reporting on vaccine research, clinical trials, and technological solutions.
+
+In 2021, sentiment declined and became net negative in the annual aggregates. Coverage during this phase placed greater emphasis on the complexities of vaccine rollout, including safety concerns, supply constraints, regulatory approval processes, and public resistance. While technological and medical innovation remained salient, the overall tone reflected growing societal tension and uncertainty.
+
+\paragraph{Competing Frames Over Time}
+
+Framing analysis reveals a clear shift in the relative prominence of public-health, economic, and civil-liberty narratives. During the initial outbreak phase, public-health risk dominated the media agenda, with economic and civil-liberty considerations appearing as secondary concerns. In 2020, innovation and growth-oriented framing—particularly around vaccine development—became the dominant narrative at the corpus level, reducing the relative weight of pure crisis framing in annual aggregates.
+
+By 2021, economic and civil-liberty frames rose substantially and began to directly compete with public-health narratives. Coverage increasingly focused on reopening strategies, labor and market impacts, and legal or ethical debates surrounding mandates and restrictions. This shift is reflected in rising topic weights for economy-related themes and increased prominence of regulatory and civil-liberty-related keyphrases during the rollout period.
+
+\paragraph{Analytical Workflow}
+
+To address this question, the system autonomously segmented the corpus into outbreak, pandemic, and vaccine-rollout phases and selected sentiment analysis, topic trend analysis, framing-shift detection, and keyphrase evolution tracking tools. These analyses were combined to identify changes in overall tone, dominant themes, and competing narrative frames across time, enabling a comparative longitudinal interpretation of media coverage.
+
+\paragraph{Summary}
+
+In summary, media coverage of COVID-19 transitioned from an initial health-crisis framing to a predominantly innovation-focused narrative during 2020, before becoming more contested and polarized during the vaccine rollout in 2021. While public-health concerns remained central throughout, economic and civil-liberty frames gained increasing prominence over time, resulting in a more conflicted media narrative during the later stages of the pandemic.
+
+
+\subsection{Media Coverage of Greta Thunberg and Youth Climate Activism}
+
+\paragraph{User Query}
+
+\textit{"How did media coverage of Greta Thunberg and youth climate activism evolve from 2018 to 2021, and how did framing and tone vary across regions and outlet types?"}
+
+\paragraph{System-Generated Summary}
+
+The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
+
+\begin{quote}
+Media coverage of Greta Thunberg rose sharply in 2019, then declined in volume but remained visible through 2021 while its emphasis shifted. The year 2019 marked a tipping point characterized by intense personalization, strong policy reporting, and a polarized backlash. Coverage in 2020 shifted toward adaptive and tactical narratives, while 2021 increasingly framed Thunberg as a celebrity-activist linked to formal policy moments, with a more balanced and sympathetic tone than in 2019.
+
+Framing varied systematically by region and outlet type: European and international mainstream outlets tended toward sympathetic personalization combined with policy amplification, whereas conservative and right-wing outlets emphasized skepticism and backlash.
+\end{quote}
+
+\paragraph{Analytical Results}
+
+Entity-tracking analysis indicates that media attention toward Greta Thunberg was minimal prior to 2019, followed by a pronounced spike in coverage during that year. After this peak, coverage volume declined but remained consistently present through 2020 and 2021, indicating sustained media relevance beyond the initial surge.
+
+Framing analysis reveals a clear temporal evolution. Coverage prior to 2019 was sparse and primarily framed through regulatory or ethical lenses. In 2019, reporting combined strong personalization with policy-oriented narratives surrounding climate action, accompanied by heightened polarization. During 2020, the dominant framing shifted toward innovation and adaptation, reflecting reporting on digital activism and new mobilization strategies during the pandemic. By 2021, coverage increasingly situated Thunberg within formal policy contexts, such as international climate summits, while maintaining a level of personalization.
+
+\paragraph{Polarization and Stance Dynamics}
+
+Automated stance detection shows that 2019 exhibited the highest degree of polarization, with a substantial proportion of articles classified as oppositional. In subsequent years, the relative share of supportive and neutral coverage increased, while explicit opposition declined. This suggests that the peak of media backlash occurred around Thunberg’s initial rise to prominence, followed by a normalization of coverage as her role became institutionalized within climate-policy discourse.
+
+\paragraph{Regional and Outlet-Type Differences}
+
+The analysis identifies systematic differences across media sources. European and international mainstream outlets were more likely to combine sympathetic personalization with policy-focused reporting, particularly in later years. Activist, local, and regional outlets emphasized movement-building, solidarity, and collective action. In contrast, conservative and right-wing outlets displayed higher levels of skepticism and critical framing, contributing disproportionately to the polarization observed in 2019. Wire services and centrist outlets tended to adopt more neutral, policy-balanced reporting styles.
+
+\paragraph{Analytical Workflow}
+
+To address this question, the system selected tools for named-entity trend tracking, framing-shift detection, stance detection over time, topic trend analysis, and source comparison. These tools were combined to assess changes in visibility, dominant narratives, and sentiment across years and outlet types, enabling a comparative longitudinal analysis of media treatment of youth climate activism.
+
+\paragraph{Summary}
+
+In summary, media coverage of Greta Thunberg evolved from minimal attention to intense, polarized visibility in 2019, followed by a period of sustained but more institutionalized reporting through 2021. While early coverage combined personalization with policy urgency and backlash, later reporting increasingly emphasized formal political engagement and climate governance. Regional and outlet-type differences played a significant role in shaping tone and framing, demonstrating the system’s ability to surface heterogeneity in media narratives across sources.
+
+\section{Hard / Multi-Hop Questions}
+
+This section evaluates the system’s ability to resolve indirect, multi-hop entity references before performing corpus analysis. Unlike the core longitudinal questions, this task requires external knowledge resolution prior to document retrieval.
+
+\subsection{Multi-Hop Entity Resolution: Melinda French Gates and the 2021 Divorce}
+
+
+\paragraph{User Query}
+
+\textit{"How did media coverage of the spouse of the Microsoft co-founder who runs a major philanthropic foundation change around the 2021 divorce announcement?"}
+
+\paragraph{System-Generated Summary}
+
+The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
+
+\begin{quote}
+Around the May 2021 divorce announcement, coverage of Melinda French Gates shifted from her long-standing public identity as a philanthropic leader to a focus on the mechanics and institutional fallout of the split. Reporting emphasized legal and financial arrangements, asset transfers, and governance implications for the Bill \& Melinda Gates Foundation, accompanied by increased attention to ethics and institutional accountability.
+\end{quote}
+
+\paragraph{Multi-Hop Reasoning and Entity Resolution}
+
+To answer this question, the system first resolved the indirect description \textit{"the spouse of the Microsoft co-founder who runs a major philanthropic foundation"} via an external knowledge lookup. This process identified the target entity as \textbf{Melinda French Gates}, linking her to Bill Gates and the Bill \& Melinda Gates Foundation. Only after this entity resolution step did the system proceed with corpus retrieval and analysis.
+
+This demonstrates the system’s ability to perform multi-hop reasoning by combining external knowledge resolution with internal document analysis, a capability not required for simpler, entity-explicit queries.
+
+\paragraph{Analytical Results}
+
+Qualitative summaries and aggregated analytics indicate a clear narrative shift in 2021. Prior to the divorce announcement, Melinda French Gates was primarily portrayed as a philanthropic leader and institutional partner within the Foundation. Following the announcement, coverage pivoted toward divorce logistics, legal and financial arrangements, and questions surrounding governance and control of the Foundation.
+
+Quantitatively, the analytics for 2021 show a slightly negative average sentiment (avg\_sentiment $\approx$ -0.08, $n=100$ documents). Framing analysis indicates that ethics and regulation-oriented narratives dominated coverage (approximately 47\%), followed by innovation and growth-related frames (approximately 36\%), with risk and crisis framing playing a smaller role. This framing distribution aligns with reporting that emphasized institutional accountability and governance implications rather than personal or philanthropic achievements.
+
+\paragraph{Entity Attention and Coverage Focus}
+
+Named-entity tracking reveals that coverage remained disproportionately focused on Bill Gates, with higher mention counts for ``Gates'' and ``Bill'' than for ``Melinda''. This suggests that even when analyzing Melinda French Gates as the primary subject, media narratives continued to frame the divorce predominantly through Bill Gates’s public persona, with Melinda’s role contextualized in relation to institutional and legal consequences.
+
+\paragraph{Limitations of the Analysis}
+
+The provided analytics represent an aggregated snapshot of coverage in 2021 and do not include a fine-grained pre- and post-announcement time series. As a result, the system cannot quantitatively measure the magnitude or immediacy of coverage changes around the May 2021 announcement date, nor detect abrupt topic shifts using dynamic change-point analysis.
+
+\paragraph{Summary}
+
+In summary, the system successfully resolved an indirect, multi-hop entity reference and identified a clear shift in media coverage following the 2021 divorce announcement. Coverage reoriented from Melinda French Gates’s philanthropic identity toward legal, financial, and governance-related narratives, framed primarily through ethics and institutional accountability. This case demonstrates the system’s capability to integrate external knowledge resolution with corpus-level analysis while also transparently reporting analytical limitations.
+
+\section{Negative-Control Questions: No real Relationship Expected}
+
+This subsection reports a negative-control experiment designed to evaluate whether the system avoids constructing spurious relationships when no meaningful link is expected.
+
+\subsection{Negative Control: Bitcoin Price Movements vs. Colgate-Palmolive Media Sentiment (2016--2021)}
+
+
+\paragraph{User Query}
+
+\textit{"Did Bitcoin price movements (2016--2021) have any systematic impact on media sentiment towards Colgate-Palmolive?"}
+
+\paragraph{System-Generated Summary}
+
+The system produced the following condensed answer based on the retrieved corpus and analytical outputs:
+
+\begin{quote}
+Based on the provided corpus and analytics, there is no evidence that Bitcoin price movements (2016--2021) had a systematic impact on media sentiment toward Colgate-Palmolive. Across the yearly summaries and sentiment signals, Colgate coverage is driven by company- and sector-specific fundamentals, and Bitcoin/crypto is not invoked as an explanatory factor.
+\end{quote}
+
+\paragraph{Analytical Results}
+
+Across the retrieved Colgate-Palmolive documents and year-level summaries, the system did not identify recurring references to Bitcoin or crypto markets as drivers of Colgate-related media sentiment. Instead, the dominant narrative in the retrieved coverage is consistently grounded in firm and sector fundamentals, including earnings-related reporting, analyst ratings, and institutional or market positioning.
+
+Year-level summarization did not surface evidence of systematic co-movement between crypto-driven news cycles and Colgate sentiment. While the sentiment-over-time outputs show variation across years and burst detection indicates years with increased Colgate coverage volume, the retrieved summaries and entity-level trends do not connect these bursts to Bitcoin events or crypto price narratives.
+
+\paragraph{System Behavior on a ``No-Link Expected'' Query}
+
+From a system perspective, this negative control demonstrates two properties of the framework. First, the pipeline preserves grounding by restricting synthesis to signals present in retrieved documents and derived analytics. Second, when the evidence does not support a relationship, the system produces a conservative conclusion rather than inferring a causal narrative. This behavior is essential for large-corpus exploration tasks, where coincidental temporal patterns can otherwise lead to misleading interpretations.
+
+\paragraph{Limitations and Requirements for Causal Testing}
+
+Although the system did not find evidence for a systematic impact, this does not constitute a definitive causal proof of ``no relationship''. The analysis is limited to the internal corpus and the available derived signals. A rigorous causal evaluation would require time-aligned Bitcoin price series, finer-grained timestamps for articles, and formal statistical causal tests. In particular, a robust test would include (i) event-window analysis around Bitcoin volatility episodes, (ii) article-level indicators for whether Colgate articles explicitly reference crypto, and (iii) time-series methods such as Granger causality or related lead--lag tests with controls for confounding macroeconomic or sector shocks.
+
+\paragraph{Summary}
+
+In summary, the negative-control experiment yields no evidence of a systematic relationship between Bitcoin price movements and media sentiment toward Colgate-Palmolive within the provided corpus and analytics. Importantly, the system responded by explicitly reporting insufficient evidence for a link and by specifying what additional data and methods would be required to test causality more rigorously. This outcome supports the system's reliability in avoiding spurious correlations during exploratory analysis.
+
+\section{Counterfactual Controls: Plausible but Non-Occurring Events}
+
+This section evaluates the system’s ability to detect and correctly handle questions that are plausible in form but rely on assumptions about events that did not occur in the real world. Such counterfactual controls are important to assess whether the system avoids producing analyses based on false premises and instead responds conservatively and transparently.
+
+\subsection{Amazon and a Hypothetical AWS IPO (2019)}
+
+\paragraph{User Query}
+
+\textit{"How did media coverage of Amazon change after it spun off AWS via a separate IPO in 2019, particularly regarding antitrust and valuation framing (2018--2020)?"}
+
+\paragraph{System Response}
+
+The system determined that the question could not be answered as posed and produced the following response:
+
+\begin{quote}
+I cannot reliably answer this question because it is based on a premise that does not correspond to real-world events. The question assumes AWS was spun off via a separate IPO in 2019. That did not occur in the real world---AWS remained part of Amazon throughout 2016--2021---so the corpus (real-world news from 2016 to 2021) contains no coverage of such an IPO. Therefore, the question as posed is not answerable from the corpus.
+\end{quote}
+
+\paragraph{Interpretation}
+
+This outcome illustrates a key safeguard in the pipeline. Rather than attempting to infer or hallucinate media effects for an event that never occurred, the system explicitly rejected the premise of the question. The rejection was not based on temporal mismatch, but on factual inconsistency between the assumed event and real-world news coverage represented in the corpus.
+
+Importantly, the system distinguished between related but valid topics---such as Amazon’s antitrust scrutiny, valuation debates, and the strategic role of AWS during 2018--2020---and the specific assumed event (a separate AWS IPO). While the former are present in the corpus, the latter is not, and therefore cannot serve as a basis for causal or comparative analysis.
+
+\paragraph{System Behavior and Robustness}
+
+From a system-design perspective, this counterfactual control demonstrates that the pipeline performs premise validation before retrieval and synthesis. This prevents misleading analyses that might otherwise arise from superficially coherent but incorrect user questions. Such behavior is particularly important in exploratory settings, where users may pose speculative or hypothetically framed questions that resemble real events.
+
+\paragraph{Alternative Analyses}
+
+When rejecting the original query, the system indicated viable alternative analytical paths that remain grounded in real data. In particular, it could (i) analyze actual media coverage of Amazon and AWS separately during 2018--2020, including antitrust and valuation framing, or (ii) explicitly frame a response as a hypothetical or counterfactual discussion rather than an empirical result. Both alternatives preserve methodological transparency while avoiding unsupported conclusions.
+
+\paragraph{Summary}
+
+In summary, this counterfactual control confirms that the system correctly identifies and rejects questions based on non-occurring events. Rather than producing speculative results, it reports the limitation clearly and suggests grounded alternatives. This behavior supports the reliability of the system for large-scale corpus exploration and highlights the importance of premise validation as a core component of LLM-assisted analytical pipelines.
+
+\subsection{Facebook Rebrand Timing and Metaverse Framing}
+
+\paragraph{User Query}
+
+\textit{"How did media sentiment toward Facebook change after the company rebranded to `Meta' in 2018, and did coverage shift toward `metaverse' framing immediately afterward (2018--2019)?"}
+
+\paragraph{System Response}
+
+The system identified the question as relying on a false premise and produced the following response:
+
+\begin{quote}
+I cannot reliably answer this question because it is based on a premise that does not correspond to real-world events. The question assumes Facebook rebranded to ``Meta'' in 2018, which is incorrect---Facebook announced the corporate rebrand to Meta in October 2021. Because that key event did not occur in 2018, the question about media sentiment and metaverse framing immediately after a 2018 rebrand is based on a false premise and cannot be answered as posed from the 2016--2021 news corpus.
+\end{quote}
+
+\paragraph{Interpretation}
+
+This counterfactual control illustrates the system’s ability to detect incorrect temporal assumptions about major corporate events. While Facebook (now Meta) is extensively covered in the corpus between 2016 and 2021, the assumed trigger event—a corporate rebrand in 2018—did not occur during that period. As a result, any attempt to analyze sentiment or framing changes “after” a 2018 rebrand would necessarily rely on fabricated causal structure.
+
+Rather than attempting to infer trends that are unsupported by the data, the system explicitly rejected the question based on factual inconsistency. This distinction is important, as the corpus does include coverage of Facebook’s actual 2021 rebrand announcement and the subsequent rise of metaverse-related framing, but those developments fall outside the temporal scope implied by the question.
+
+\paragraph{System Behavior and Robustness}
+
+From a system perspective, this example demonstrates robust premise validation beyond simple temporal filtering. The system correctly distinguished between (i) the presence of relevant entities and topics in the corpus (Facebook, sentiment, metaverse-related discourse) and (ii) the absence of the specific assumed event during the queried time window. This prevents the generation of misleading analyses based on incorrect event timing.
+
+\paragraph{Alternative Analyses}
+
+When rejecting the original query, the system implicitly suggests viable alternatives that remain grounded in real-world data. In particular, the corpus supports analyses of (i) media sentiment toward Facebook prior to the actual 2021 rebrand, and (ii) shifts in metaverse-related framing following the October 2021 announcement. A revised question targeting late 2021 coverage could therefore be answered empirically using the same pipeline.
+
+\paragraph{Summary}
+
+In summary, this counterfactual control confirms that the system correctly identifies and rejects questions based on incorrect assumptions about the timing of real-world events. By doing so, it avoids speculative or hallucinated conclusions and maintains methodological transparency. Together with the other counterfactual examples, this case highlights premise validation as a critical safeguard in LLM-assisted large-scale media analysis.
+
+

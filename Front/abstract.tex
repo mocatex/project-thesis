@@ -5,5 +5,11 @@
 %----------------------------------------------------------------------------------------
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-The abstract is like a miniature version of the entire manuscript. Structure it similarly: Begin with the context and motivation for the project, a brief description of the method and available data, your findings, and conclusions. Limit yourself to one page!
+Large news corpora provide rich information about real-world events and their public perception over time.\\
+However, extracting meaningful insights from such corpora is challenging due to their size, temporal complexity, and the fragmented nature of relevant information. Classical natural language processing techniques enable scalable extraction of structured signals but require substantial manual interpretation, while large language models offer high-level reasoning but cannot directly process large document collections.
+
+This thesis presents CorpusAgent, a hybrid analysis system designed for exploratory analysis of large news corpora. The system combines classical NLP methods for scalable signal extraction with LLM-based reasoning for planning, synthesis, and explanation. A database-centric architecture is used to store documents and intermediate results, enabling reproducible analyses and traceable answers to complex, temporally structured research questions.
+
+The approach is evaluated through a set of longitudinal case studies on a large English-language news corpus, covering topics such as political coverage, corporate crises, public health events, and social movements. The results demonstrate that CorpusAgent can autonomously decompose complex analytical questions, select appropriate analytical NLP tools, and synthesize coherent, context-aware interpretations while explicitly handling uncertainty, missing evidence, and false premises. \\
+This work contributes a system-level perspective on how LLMs can be integrated responsibly into large-scale text analysis workflows, focusing on analytical reliability, interpretability, and exploratory use rather than the development of new NLP models.
 \end{abstract}
